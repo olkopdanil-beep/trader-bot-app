@@ -140,33 +140,82 @@
       letter-spacing: .2px;
     }
 
-    select {
+    .ios-select {
+      position: relative;
+    }
+    .ios-select-trigger {
       width: 100%;
       height: 44px;
       border-radius: 14px;
       border: 1px solid var(--line-soft);
       background: linear-gradient(180deg, rgba(18, 24, 22, 0.92), rgba(10, 16, 14, 0.92));
       color: var(--text);
-      padding: 0 40px 0 12px;
+      padding: 0 38px 0 12px;
       outline: none;
-      font-weight: 600;
-      appearance: none;
-      -webkit-appearance: none;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
       transition: border-color .2s ease, box-shadow .2s ease, transform .18s ease;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 0 rgba(0, 0, 0, 0.35);
-      background-image:
-        linear-gradient(45deg, transparent 50%, #9fd8b8 50%),
-        linear-gradient(135deg, #9fd8b8 50%, transparent 50%);
-      background-position:
-        calc(100% - 18px) 18px,
-        calc(100% - 12px) 18px;
-      background-size: 6px 6px, 6px 6px;
-      background-repeat: no-repeat;
     }
-    select:focus {
+    .ios-select-trigger::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid #9fd8b8;
+      border-bottom: 2px solid #9fd8b8;
+      transform: translateY(-60%) rotate(45deg);
+      transition: transform .24s ease;
+      pointer-events: none;
+    }
+    .ios-select.open .ios-select-trigger {
       border-color: var(--line);
       box-shadow: 0 0 0 3px rgba(67, 255, 159, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.08);
       transform: translateY(-1px);
+    }
+    .ios-select.open .ios-select-trigger::after {
+      transform: translateY(-25%) rotate(-135deg);
+    }
+    .ios-select-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 8px);
+      background: rgba(14, 20, 18, 0.98);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.42);
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+      pointer-events: none;
+      transition: opacity .24s ease, transform .24s ease;
+      z-index: 10;
+    }
+    .ios-select.open .ios-select-menu {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .ios-option {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: transparent;
+      color: #eafff2;
+      text-align: left;
+      padding: 11px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease;
+    }
+    .ios-option:last-child { border-bottom: 0; }
+    .ios-option:hover {
+      background: rgba(67, 255, 159, 0.18);
+      color: #f4fff8;
     }
 
     .upload-wrap {
@@ -379,20 +428,24 @@
       <div class="grid-2">
         <div>
           <label for="pairSelect">Валютная пара</label>
-          <select id="pairSelect">
-            <option value="">Выберите</option>
-            <option value="EUR/USD">EUR/USD</option>
-          </select>
+          <div class="ios-select" id="pairSelect">
+            <button class="ios-select-trigger" type="button" data-value="">Выберите</button>
+            <div class="ios-select-menu">
+              <button class="ios-option" type="button" data-value="EUR/USD">EUR/USD</button>
+            </div>
+          </div>
         </div>
         <div>
           <label for="expirySelect">Время экспирации</label>
-          <select id="expirySelect">
-            <option value="">Выберите</option>
-            <option value="10 секунд">10 секунд</option>
-            <option value="1 минута">1 минута</option>
-            <option value="5 минут">5 минут</option>
-            <option value="10 минут">10 минут</option>
-          </select>
+          <div class="ios-select" id="expirySelect">
+            <button class="ios-select-trigger" type="button" data-value="">Выберите</button>
+            <div class="ios-select-menu">
+              <button class="ios-option" type="button" data-value="10 секунд">10 секунд</button>
+              <button class="ios-option" type="button" data-value="1 минута">1 минута</button>
+              <button class="ios-option" type="button" data-value="5 минут">5 минут</button>
+              <button class="ios-option" type="button" data-value="10 минут">10 минут</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -453,6 +506,8 @@
 
   const pairSelect = document.getElementById("pairSelect");
   const expirySelect = document.getElementById("expirySelect");
+  const pairTrigger = pairSelect.querySelector(".ios-select-trigger");
+  const expiryTrigger = expirySelect.querySelector(".ios-select-trigger");
   const uploadWrap = document.getElementById("uploadWrap");
   const imageInput = document.getElementById("imageInput");
 
@@ -480,12 +535,41 @@
   tabAnalyze.addEventListener("click", () => switchTab(false));
   tabProfile.addEventListener("click", () => switchTab(true));
 
+  function selectedValue(selectEl) {
+    return selectEl.querySelector(".ios-select-trigger").dataset.value || "";
+  }
+
+  function closeAllSelects() {
+    document.querySelectorAll(".ios-select.open").forEach((el) => el.classList.remove("open"));
+  }
+
+  function setupCustomSelect(selectEl) {
+    const trigger = selectEl.querySelector(".ios-select-trigger");
+    const options = selectEl.querySelectorAll(".ios-option");
+    trigger.addEventListener("click", () => {
+      const willOpen = !selectEl.classList.contains("open");
+      closeAllSelects();
+      if (willOpen) selectEl.classList.add("open");
+    });
+    options.forEach((opt) => {
+      opt.addEventListener("click", () => {
+        trigger.dataset.value = opt.dataset.value;
+        trigger.textContent = opt.dataset.value;
+        selectEl.classList.remove("open");
+        updateUploadVisibility();
+      });
+    });
+  }
+
   function updateUploadVisibility() {
-    const ready = pairSelect.value && expirySelect.value;
+    const ready = selectedValue(pairSelect) && selectedValue(expirySelect);
     uploadWrap.style.display = ready ? "block" : "none";
   }
-  pairSelect.addEventListener("change", updateUploadVisibility);
-  expirySelect.addEventListener("change", updateUploadVisibility);
+  setupCustomSelect(pairSelect);
+  setupCustomSelect(expirySelect);
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".ios-select")) closeAllSelects();
+  });
   updateUploadVisibility();
 
   function renderHistory(items) {
@@ -522,8 +606,8 @@
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const pair = pairSelect.value;
-    const expiry = expirySelect.value;
+    const pair = selectedValue(pairSelect);
+    const expiry = selectedValue(expirySelect);
     if (!pair || !expiry) return;
 
     statusEl.textContent = "AI ANALYZING MARKET DATA.";
