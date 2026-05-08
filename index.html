@@ -407,10 +407,96 @@
       color: var(--muted);
       font-size: 13px;
     }
+
+    .intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      background: radial-gradient(circle at top, rgba(67, 255, 159, 0.09), transparent 45%), rgba(2, 5, 5, 0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 1;
+      transform: translateY(0);
+      animation: introFadeIn .4s ease-out;
+    }
+    .intro-overlay.hidden {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .intro-title {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 0.6rem;
+      text-transform: uppercase;
+      text-align: center;
+      margin: 0 0 10px;
+      text-shadow: 0 0 18px rgba(67, 255, 159, 0.55);
+    }
+    .intro-subtitle {
+      margin: 0 0 26px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .35rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .intro-btn {
+      min-width: 220px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: linear-gradient(90deg, #1f9d62, #42ff9f);
+      color: #020505;
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      padding: 11px 22px;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .intro-btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+    }
+    .intro-exit {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .intro-noise {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 2px);
+      mix-blend-mode: screen;
+      opacity: .7;
+    }
+    @keyframes introFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
 <canvas id="matrix"></canvas>
+
+<div id="introOverlay" class="intro-overlay">
+  <div class="intro-noise"></div>
+  <div style="position: relative; z-index: 1; text-align: center;">
+    <p class="intro-title">КАМПУС ТРЕЙДЕРА</p>
+    <p class="intro-subtitle">matrix trade environment</p>
+    <button id="introStart" class="intro-btn" type="button">Войти в систему</button>
+    <div id="introExit" class="intro-exit">Выйти из системы</div>
+  </div>
+</div>
 
 <div class="screen">
   <div class="app">
@@ -689,6 +775,28 @@
   resize();
   setInterval(draw, 40);
   loadHistory();
+
+  const introOverlay = document.getElementById("introOverlay");
+  const introStart = document.getElementById("introStart");
+  const introExit = document.getElementById("introExit");
+
+  function hideIntro() {
+    if (!introOverlay || introOverlay.classList.contains("hidden")) return;
+    introOverlay.classList.add("hidden");
+    setTimeout(() => {
+      if (introOverlay.parentNode) introOverlay.parentNode.removeChild(introOverlay);
+    }, 380);
+  }
+
+  introStart.addEventListener("click", () => {
+    hideIntro();
+    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
+  });
+
+  introExit.addEventListener("click", () => {
+    if (tg?.close) tg.close();
+    else window.close();
+  });
 </script>
 </body>
 </html>
