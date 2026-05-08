@@ -5,136 +5,360 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Matrix Trade Analyzer</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="./config.js"></script>
   <style>
     :root {
-      --bg: #05070d;
-      --panel: rgba(10, 15, 28, 0.88);
-      --line: rgba(77, 124, 255, 0.3);
-      --text: #d9e5ff;
-      --muted: #95a3bf;
-      --up: #31d07f;
-      --down: #ff4d67;
-      --blue: #3b82f6;
-      --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+      --bg: #04090a;
+      --glass: rgba(0, 0, 0, 0.6);
+      --line: rgba(49, 208, 127, 0.35);
+      --line-soft: rgba(124, 124, 124, 0.3);
+      --text: #e5fbee;
+      --muted: #9fb4aa;
+      --neon: #3cff97;
+      --neon-soft: rgba(60, 255, 151, 0.28);
+      --danger: #ff617f;
+      --ok: #35e386;
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100%; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
 
     #matrix {
       position: fixed;
       inset: 0;
       z-index: 0;
-      opacity: 0.22;
+      opacity: 0.25;
     }
 
-    .wrap {
+    .screen {
       position: relative;
       z-index: 1;
       min-height: 100vh;
       padding: 18px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
     }
 
-    .card {
-      width: min(560px, 100%);
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-      padding: 20px;
+    .app {
+      width: min(620px, 100%);
+      background: var(--glass);
+      border: 1px solid var(--line-soft);
+      border-radius: 22px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+      padding: 18px;
     }
 
-    .title { margin: 0 0 8px; font-size: 22px; letter-spacing: 0.2px; }
-    .subtitle { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+    .head {
+      margin-bottom: 14px;
+    }
 
-    .btn {
-      width: 100%;
-      border: 0;
+    .title {
+      margin: 0;
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 14px rgba(60, 255, 151, 0.13);
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 0.15px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn {
+      border: 1px solid var(--line-soft);
+      color: var(--text);
+      background: rgba(8, 17, 14, 0.62);
       border-radius: 12px;
-      padding: 14px 16px;
+      height: 42px;
       cursor: pointer;
       font-weight: 700;
-      letter-spacing: 0.2px;
-      color: white;
-      background: linear-gradient(90deg, #3b82f6, #22c55e);
-      transition: transform 0.15s ease, opacity 0.2s ease;
+      transition: all .22s ease;
     }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .tab-btn:hover {
+      box-shadow: inset 0 0 20px var(--neon-soft), 0 0 10px rgba(60, 255, 151, 0.22);
+      border-color: var(--line);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(90deg, rgba(16, 40, 28, 0.8), rgba(16, 54, 33, 0.8));
+      border-color: var(--line);
+      box-shadow: inset 0 0 24px var(--neon-soft);
+    }
+
+    .panel {
+      display: none;
+      border: 1px solid var(--line-soft);
+      border-radius: 15px;
+      background: rgba(7, 12, 10, 0.64);
+      backdrop-filter: blur(12px);
+      padding: 14px;
+    }
+    .panel.active { display: block; animation: panelIn .28s ease; }
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #8ea89a;
+      margin-bottom: 4px;
+      font-weight: 600;
+      letter-spacing: .2px;
+    }
+
+    select {
+      width: 100%;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--line-soft);
+      background: rgba(0, 0, 0, 0.45);
+      color: var(--text);
+      padding: 0 10px;
+      outline: none;
+      font-weight: 600;
+    }
+
+    .upload-wrap {
+      display: none;
+      margin-top: 8px;
+      animation: panelIn .25s ease;
+    }
+
+    .upload-btn {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      height: 46px;
+      color: #f3fff8;
+      font-weight: 800;
+      letter-spacing: .25px;
+      cursor: pointer;
+      background: linear-gradient(90deg, #1f9d62, #2dd4bf);
+      box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+      transition: transform .15s ease, box-shadow .22s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.24), transparent 80%);
+      transform: translateX(-130%);
+      animation: shimmer 2.4s linear infinite;
+      pointer-events: none;
+    }
+
+    .upload-btn:hover {
+      box-shadow: inset 0 0 30px var(--neon-soft), 0 0 16px rgba(60, 255, 151, 0.35);
+      transform: translateY(-1px);
+    }
+
+    @keyframes shimmer {
+      to { transform: translateX(130%); }
+    }
 
     input[type="file"] { display: none; }
 
     .status {
-      margin-top: 14px;
-      min-height: 20px;
-      font-size: 14px;
-      color: var(--muted);
+      margin-top: 10px;
+      min-height: 22px;
+      color: #79f3b5;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 13px;
     }
 
     .result {
-      margin-top: 16px;
+      margin-top: 12px;
       display: none;
-      border-radius: 14px;
       border: 1px solid var(--line);
-      padding: 14px;
-      background: rgba(15, 20, 38, 0.75);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 12px;
     }
+    .result.show { display: block; animation: panelIn .25s ease; }
 
     .signal {
       margin: 0;
-      font-size: 24px;
-      font-weight: 800;
-      text-transform: uppercase;
+      font-size: 25px;
+      font-weight: 900;
+      letter-spacing: .25px;
     }
-    .signal.up { color: var(--up); text-shadow: 0 0 12px rgba(49, 208, 127, 0.4); }
-    .signal.down { color: var(--down); text-shadow: 0 0 12px rgba(255, 77, 103, 0.45); }
+    .signal.up { color: var(--ok); text-shadow: 0 0 16px rgba(53, 227, 134, 0.4); }
+    .signal.down { color: var(--danger); text-shadow: 0 0 16px rgba(255, 97, 127, 0.35); }
 
-    .conf { margin: 8px 0; font-size: 17px; }
-    .why { margin: 0; color: #b9c7e7; line-height: 1.42; }
+    .confidence { margin: 8px 0 6px; font-size: 20px; font-weight: 800; }
+    .reasoning { margin: 0; color: #bdd8c8; line-height: 1.45; }
 
     .partner {
-      margin-top: 16px;
+      margin-top: 12px;
       display: none;
       text-align: center;
     }
     .partner a {
       display: inline-block;
       text-decoration: none;
-      color: #fff;
-      padding: 12px 16px;
-      border-radius: 11px;
-      background: linear-gradient(90deg, #ef4444, #3b82f6);
+      color: white;
+      font-weight: 800;
+      border-radius: 10px;
+      padding: 11px 15px;
+      border: 1px solid var(--line-soft);
+      background: linear-gradient(90deg, #1b8e58, #2f7dfa);
+      transition: box-shadow .22s ease;
+    }
+    .partner a:hover { box-shadow: inset 0 0 20px var(--neon-soft), 0 0 12px rgba(60, 255, 151, .2); }
+
+    .profile-box {
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.34);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .nick {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .meta {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .history-title {
+      margin: 10px 0 8px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #c7f7dc;
+    }
+
+    .history {
+      max-height: 320px;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+    }
+
+    .history-item {
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      background: rgba(7, 16, 12, 0.55);
+      padding: 9px 10px;
+      font-size: 13px;
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
       font-weight: 700;
-      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+      margin-bottom: 4px;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
     }
   </style>
 </head>
 <body>
 <canvas id="matrix"></canvas>
 
-<div class="wrap">
-  <div class="card">
-    <h1 class="title">Matrix Trade Analyzer</h1>
-    <p class="subtitle">Загрузите скриншот графика, чтобы получить сигнал.</p>
-
-    <label class="btn" for="imageInput" id="uploadBtn">Загрузить скриншот графика</label>
-    <input id="imageInput" type="file" accept="image/*">
-
-    <div id="status" class="status"></div>
-
-    <div id="result" class="result">
-      <p id="signal" class="signal">—</p>
-      <p id="confidence" class="conf"></p>
-      <p id="reasoning" class="why"></p>
+<div class="screen">
+  <div class="app">
+    <div class="head">
+      <h1 class="title">Matrix Trade Analyzer</h1>
+      <p class="subtitle">AI анализ завершен</p>
     </div>
 
-    <div id="partner" class="partner">
-      <a id="partnerLink" href="#" target="_blank" rel="noopener noreferrer">Открыть Pocket Option</a>
+    <div class="tabs">
+      <button id="tabAnalyze" class="tab-btn active" type="button">Анализ скриншота</button>
+      <button id="tabProfile" class="tab-btn" type="button">Профиль</button>
     </div>
+
+    <section id="analyzePanel" class="panel active">
+      <div class="grid-2">
+        <div>
+          <label for="pairSelect">Валютная пара</label>
+          <select id="pairSelect">
+            <option value="">Выберите</option>
+            <option value="EUR/USD">EUR/USD</option>
+          </select>
+        </div>
+        <div>
+          <label for="expirySelect">Время экспирации</label>
+          <select id="expirySelect">
+            <option value="">Выберите</option>
+            <option value="10 секунд">10 секунд</option>
+            <option value="1 минута">1 минута</option>
+            <option value="5 минут">5 минут</option>
+            <option value="10 минут">10 минут</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="uploadWrap" class="upload-wrap">
+        <label class="upload-btn" for="imageInput">Загрузить скриншот</label>
+      </div>
+      <input id="imageInput" type="file" accept="image/*">
+
+      <div id="status" class="status"></div>
+
+      <div id="result" class="result">
+        <p id="signal" class="signal">—</p>
+        <p id="confidence" class="confidence"></p>
+        <p id="reasoning" class="reasoning"></p>
+      </div>
+
+      <div id="partner" class="partner">
+        <a id="partnerLink" href="#" target="_blank" rel="noopener noreferrer">Открыть Pocket Option</a>
+      </div>
+    </section>
+
+    <section id="profilePanel" class="panel">
+      <div class="profile-box">
+        <p id="profileNick" class="nick">@trader</p>
+        <p id="profileMeta" class="meta">История последних сигналов</p>
+      </div>
+      <div class="history-title">История сигналов</div>
+      <div id="history" class="history"></div>
+    </section>
   </div>
 </div>
 
@@ -143,15 +367,31 @@
   if (tg) {
     tg.expand();
     tg.ready();
-    tg.setHeaderColor("#05070d");
-    tg.setBackgroundColor("#05070d");
+    tg.setHeaderColor("#04090a");
+    tg.setBackgroundColor("#04090a");
   }
 
+  const CONFIG_API_BASE = window.APP_CONFIG?.API_BASE || "";
   const API_BASE = window.location.hostname === "localhost"
     ? "http://localhost:8000"
-    : "http://127.0.0.1:8000";
+    : (CONFIG_API_BASE && !CONFIG_API_BASE.includes("REPLACE_WITH_YOUR_BACKEND_URL")
+      ? CONFIG_API_BASE
+      : "http://127.0.0.1:8000");
 
+  const currentUser = tg?.initDataUnsafe?.user || {};
+  const userId = String(currentUser.id || "anonymous");
+  const username = currentUser.username ? `@${currentUser.username}` : (currentUser.first_name || "Trader");
+
+  const tabAnalyze = document.getElementById("tabAnalyze");
+  const tabProfile = document.getElementById("tabProfile");
+  const analyzePanel = document.getElementById("analyzePanel");
+  const profilePanel = document.getElementById("profilePanel");
+
+  const pairSelect = document.getElementById("pairSelect");
+  const expirySelect = document.getElementById("expirySelect");
+  const uploadWrap = document.getElementById("uploadWrap");
   const imageInput = document.getElementById("imageInput");
+
   const statusEl = document.getElementById("status");
   const resultEl = document.getElementById("result");
   const signalEl = document.getElementById("signal");
@@ -160,53 +400,116 @@
   const partnerWrapEl = document.getElementById("partner");
   const partnerLinkEl = document.getElementById("partnerLink");
 
+  const profileNick = document.getElementById("profileNick");
+  const historyEl = document.getElementById("history");
+  profileNick.textContent = username;
+
+  function switchTab(isProfile) {
+    tabAnalyze.classList.toggle("active", !isProfile);
+    tabProfile.classList.toggle("active", isProfile);
+    analyzePanel.classList.toggle("active", !isProfile);
+    profilePanel.classList.toggle("active", isProfile);
+    if (isProfile) loadHistory();
+  }
+
+  tabAnalyze.addEventListener("click", () => switchTab(false));
+  tabProfile.addEventListener("click", () => switchTab(true));
+
+  function updateUploadVisibility() {
+    const ready = pairSelect.value && expirySelect.value;
+    uploadWrap.style.display = ready ? "block" : "none";
+  }
+  pairSelect.addEventListener("change", updateUploadVisibility);
+  expirySelect.addEventListener("change", updateUploadVisibility);
+  updateUploadVisibility();
+
+  function renderHistory(items) {
+    if (!items || items.length === 0) {
+      historyEl.innerHTML = '<div class="empty">Сигналов пока нет.</div>';
+      return;
+    }
+    historyEl.innerHTML = items.map((item) => {
+      const time = new Date(item.created_at).toLocaleString("ru-RU");
+      const dir = item.direction === "UP" ? "ВВЕРХ" : "ВНИЗ";
+      return `
+        <div class="history-item">
+          <div class="history-top">
+            <span>${item.pair} • ${item.expiry}</span>
+            <span>${time}</span>
+          </div>
+          <div>Сигнал: ${dir} | ${item.confidence}%</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${API_BASE}/history/${encodeURIComponent(userId)}`);
+      const data = await res.json();
+      renderHistory(data.items || []);
+    } catch {
+      historyEl.innerHTML = '<div class="empty">Не удалось загрузить историю.</div>';
+    }
+  }
+
   imageInput.addEventListener("change", async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    statusEl.textContent = "Анализируем изображение...";
-    resultEl.style.display = "none";
+    const pair = pairSelect.value;
+    const expiry = expirySelect.value;
+    if (!pair || !expiry) return;
+
+    statusEl.textContent = "AI ANALYZING MARKET DATA.";
+    resultEl.classList.remove("show");
     partnerWrapEl.style.display = "none";
+
+    let step = 0;
+    const ticker = setInterval(() => {
+      step += 1;
+      statusEl.textContent = `AI ANALYZING MARKET DATA${".".repeat((step % 3) + 1)}`;
+    }, 320);
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("user_id", userId);
+    formData.append("username", username);
+    formData.append("pair", pair);
+    formData.append("expiry", expiry);
 
     try {
-      const response = await fetch(`${API_BASE}/analyze`, {
-        method: "POST",
-        body: formData
-      });
-
+      const response = await fetch(`${API_BASE}/analyze`, { method: "POST", body: formData });
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.detail || "Ошибка анализа");
-      }
+      if (!response.ok) throw new Error(data.detail || "Ошибка анализа");
 
       const isUp = data.direction === "UP";
       signalEl.textContent = isUp ? "СИГНАЛ: ВВЕРХ" : "СИГНАЛ: ВНИЗ";
       signalEl.className = `signal ${isUp ? "up" : "down"}`;
-      confidenceEl.textContent = `Уверенность: ${data.confidence}%`;
-      reasoningEl.textContent = data.reasoning || "";
-
+      confidenceEl.textContent = `ПРОЦЕНТ ЗАХОДА СДЕЛКИ: ${data.confidence}%`;
+      reasoningEl.textContent = data.reasoning || "AI анализ завершен";
       partnerLinkEl.href = data.partner_link || "https://pocketoption.com";
 
-      resultEl.style.display = "block";
+      resultEl.classList.add("show");
       partnerWrapEl.style.display = "block";
-      statusEl.textContent = "Готово.";
-
+      statusEl.textContent = "AI анализ завершен";
       if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
     } catch (error) {
       statusEl.textContent = `Ошибка: ${error.message}`;
       if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
+    } finally {
+      clearInterval(ticker);
+      imageInput.value = "";
+      loadHistory();
     }
   });
 
-  // Matrix animation
+  // Matrix background animation
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
   const glyphs = "01アイウエオカキクケコサシスセソ1234567890BTCUSDT▲▼";
   let columns = [];
-  let fontSize = 14;
+  const fontSize = 14;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -216,7 +519,7 @@
   }
 
   function draw() {
-    ctx.fillStyle = "rgba(5, 7, 13, 0.08)";
+    ctx.fillStyle = "rgba(4, 9, 10, 0.09)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.font = `${fontSize}px monospace`;
 
@@ -224,11 +527,9 @@
       const text = glyphs[Math.floor(Math.random() * glyphs.length)];
       const x = i * fontSize;
       const y = columns[i] * fontSize;
-
-      const green = 120 + Math.floor(Math.random() * 110);
-      ctx.fillStyle = `rgb(20, ${green}, 80)`;
+      const g = 120 + Math.floor(Math.random() * 120);
+      ctx.fillStyle = `rgb(35, ${g}, 95)`;
       ctx.fillText(text, x, y);
-
       if (y > canvas.height && Math.random() > 0.975) columns[i] = 0;
       columns[i] += 1;
     }
@@ -237,6 +538,7 @@
   window.addEventListener("resize", resize);
   resize();
   setInterval(draw, 40);
+  loadHistory();
 </script>
 </body>
 </html>
