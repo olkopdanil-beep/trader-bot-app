@@ -8,16 +8,17 @@
   <script src="./config.js"></script>
   <style>
     :root {
-      --bg: #04090a;
+      --bg: #020505;
       --glass: rgba(0, 0, 0, 0.6);
-      --line: rgba(49, 208, 127, 0.35);
-      --line-soft: rgba(124, 124, 124, 0.3);
-      --text: #e5fbee;
-      --muted: #9fb4aa;
-      --neon: #3cff97;
-      --neon-soft: rgba(60, 255, 151, 0.28);
+      --line: rgba(58, 255, 142, 0.4);
+      --line-soft: rgba(86, 104, 96, 0.35);
+      --text: #eafff2;
+      --muted: #98aa9f;
+      --neon: #43ff9f;
+      --neon-soft: rgba(67, 255, 159, 0.3);
       --danger: #ff617f;
       --ok: #35e386;
+      --hud-dark: rgba(5, 11, 9, 0.7);
     }
 
     * { box-sizing: border-box; }
@@ -56,6 +57,30 @@
       backdrop-filter: blur(12px);
       box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
       padding: 18px;
+      clip-path: polygon(0 14px, 14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px));
+      position: relative;
+    }
+
+    .app::before,
+    .app::after {
+      content: "";
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border: 1px solid rgba(67, 255, 159, 0.45);
+      pointer-events: none;
+    }
+    .app::before {
+      left: 8px;
+      top: 8px;
+      border-right: 0;
+      border-bottom: 0;
+    }
+    .app::after {
+      right: 8px;
+      bottom: 8px;
+      border-left: 0;
+      border-top: 0;
     }
 
     .head {
@@ -66,15 +91,17 @@
       margin: 0;
       font-size: 27px;
       font-weight: 800;
-      letter-spacing: 0.3px;
-      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 14px rgba(60, 255, 151, 0.13);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 16px rgba(67, 255, 159, 0.18);
     }
 
     .subtitle {
       margin: 6px 0 0;
       color: var(--muted);
-      font-size: 14px;
-      letter-spacing: 0.15px;
+      font-size: 13px;
+      letter-spacing: 0.35px;
+      text-transform: uppercase;
     }
 
     .tabs {
@@ -87,12 +114,14 @@
     .tab-btn {
       border: 1px solid var(--line-soft);
       color: var(--text);
-      background: rgba(8, 17, 14, 0.62);
+      background: var(--hud-dark);
       border-radius: 12px;
       height: 42px;
       cursor: pointer;
       font-weight: 700;
       transition: all .22s ease;
+      clip-path: polygon(0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px));
+      letter-spacing: .25px;
     }
 
     .tab-btn:hover {
@@ -101,7 +130,7 @@
     }
 
     .tab-btn.active {
-      background: linear-gradient(90deg, rgba(16, 40, 28, 0.8), rgba(16, 54, 33, 0.8));
+      background: linear-gradient(90deg, rgba(20, 52, 36, 0.84), rgba(17, 56, 35, 0.84));
       border-color: var(--line);
       box-shadow: inset 0 0 24px var(--neon-soft);
     }
@@ -110,9 +139,22 @@
       display: none;
       border: 1px solid var(--line-soft);
       border-radius: 15px;
-      background: rgba(7, 12, 10, 0.64);
+      background: rgba(7, 12, 10, 0.68);
       backdrop-filter: blur(12px);
       padding: 14px;
+      clip-path: polygon(0 12px, 12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px));
+      position: relative;
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      width: 18px;
+      height: 18px;
+      border-left: 1px solid rgba(67, 255, 159, 0.45);
+      border-bottom: 1px solid rgba(67, 255, 159, 0.45);
+      pointer-events: none;
     }
     .panel.active { display: block; animation: panelIn .28s ease; }
     @keyframes panelIn {
@@ -146,6 +188,7 @@
       padding: 0 10px;
       outline: none;
       font-weight: 600;
+      appearance: none;
     }
 
     .upload-wrap {
@@ -171,6 +214,8 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
+      clip-path: polygon(0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px));
+      text-transform: uppercase;
     }
 
     .upload-btn::after {
@@ -209,6 +254,7 @@
       border-radius: 12px;
       background: rgba(0, 0, 0, 0.4);
       padding: 12px;
+      clip-path: polygon(0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px));
     }
     .result.show { display: block; animation: panelIn .25s ease; }
 
@@ -222,6 +268,22 @@
     .signal.down { color: var(--danger); text-shadow: 0 0 16px rgba(255, 97, 127, 0.35); }
 
     .confidence { margin: 8px 0 6px; font-size: 20px; font-weight: 800; }
+    .progress {
+      margin: 8px 0 9px;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(67, 255, 159, 0.25);
+      overflow: hidden;
+    }
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #1d8d57, #42ff9f);
+      box-shadow: 0 0 12px rgba(67, 255, 159, 0.42);
+      transition: width .45s ease;
+    }
     .reasoning { margin: 0; color: #bdd8c8; line-height: 1.45; }
 
     .partner {
@@ -239,6 +301,7 @@
       border: 1px solid var(--line-soft);
       background: linear-gradient(90deg, #1b8e58, #2f7dfa);
       transition: box-shadow .22s ease;
+      clip-path: polygon(0 9px, 9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px));
     }
     .partner a:hover { box-shadow: inset 0 0 20px var(--neon-soft), 0 0 12px rgba(60, 255, 151, .2); }
 
@@ -248,6 +311,7 @@
       background: rgba(0, 0, 0, 0.34);
       padding: 12px;
       margin-bottom: 10px;
+      clip-path: polygon(0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px));
     }
 
     .nick {
@@ -281,6 +345,7 @@
       background: rgba(7, 16, 12, 0.55);
       padding: 9px 10px;
       font-size: 13px;
+      clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px));
     }
 
     .history-top {
@@ -289,6 +354,25 @@
       gap: 8px;
       font-weight: 700;
       margin-bottom: 4px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #dffff0;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #43ff9f;
+      box-shadow: 0 0 10px rgba(67, 255, 159, 0.6);
+    }
+    .dot.down {
+      background: #ff617f;
+      box-shadow: 0 0 10px rgba(255, 97, 127, 0.5);
     }
 
     .empty {
@@ -343,6 +427,7 @@
       <div id="result" class="result">
         <p id="signal" class="signal">—</p>
         <p id="confidence" class="confidence"></p>
+        <div class="progress"><div id="confidenceBar"></div></div>
         <p id="reasoning" class="reasoning"></p>
       </div>
 
@@ -397,6 +482,7 @@
   const signalEl = document.getElementById("signal");
   const confidenceEl = document.getElementById("confidence");
   const reasoningEl = document.getElementById("reasoning");
+  const confidenceBar = document.getElementById("confidenceBar");
   const partnerWrapEl = document.getElementById("partner");
   const partnerLinkEl = document.getElementById("partnerLink");
 
@@ -437,7 +523,7 @@
             <span>${item.pair} • ${item.expiry}</span>
             <span>${time}</span>
           </div>
-          <div>Сигнал: ${dir} | ${item.confidence}%</div>
+          <div class="badge"><span class="dot ${item.direction === "DOWN" ? "down" : ""}"></span>Сигнал: ${dir} | ${item.confidence}%</div>
         </div>
       `;
     }).join("");
@@ -487,6 +573,7 @@
       signalEl.textContent = isUp ? "СИГНАЛ: ВВЕРХ" : "СИГНАЛ: ВНИЗ";
       signalEl.className = `signal ${isUp ? "up" : "down"}`;
       confidenceEl.textContent = `ПРОЦЕНТ ЗАХОДА СДЕЛКИ: ${data.confidence}%`;
+      confidenceBar.style.width = `${Math.max(0, Math.min(100, Number(data.confidence) || 0))}%`;
       reasoningEl.textContent = data.reasoning || "AI анализ завершен";
       partnerLinkEl.href = data.partner_link || "https://pocketoption.com";
 
