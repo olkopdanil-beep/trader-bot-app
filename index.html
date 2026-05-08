@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Trade Analyzer</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #05070d;
+      --panel: rgba(10, 15, 28, 0.88);
+      --line: rgba(77, 124, 255, 0.3);
+      --text: #d9e5ff;
+      --muted: #95a3bf;
+      --up: #31d07f;
+      --down: #ff4d67;
+      --blue: #3b82f6;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: Inter, Segoe UI, Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100%; }
+
+    #matrix {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.22;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: min(560px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+    }
+
+    .title { margin: 0 0 8px; font-size: 22px; letter-spacing: 0.2px; }
+    .subtitle { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+
+    .btn {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: white;
+      background: linear-gradient(90deg, #3b82f6, #22c55e);
+      transition: transform 0.15s ease, opacity 0.2s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    input[type="file"] { display: none; }
+
+    .status {
+      margin-top: 14px;
+      min-height: 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .result {
+      margin-top: 16px;
+      display: none;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      padding: 14px;
+      background: rgba(15, 20, 38, 0.75);
+    }
+
+    .signal {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .signal.up { color: var(--up); text-shadow: 0 0 12px rgba(49, 208, 127, 0.4); }
+    .signal.down { color: var(--down); text-shadow: 0 0 12px rgba(255, 77, 103, 0.45); }
+
+    .conf { margin: 8px 0; font-size: 17px; }
+    .why { margin: 0; color: #b9c7e7; line-height: 1.42; }
+
+    .partner {
+      margin-top: 16px;
+      display: none;
+      text-align: center;
+    }
+    .partner a {
+      display: inline-block;
+      text-decoration: none;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 11px;
+      background: linear-gradient(90deg, #ef4444, #3b82f6);
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+    }
+  </style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+
+<div class="wrap">
+  <div class="card">
+    <h1 class="title">Matrix Trade Analyzer</h1>
+    <p class="subtitle">Загрузите скриншот графика, чтобы получить сигнал.</p>
+
+    <label class="btn" for="imageInput" id="uploadBtn">Загрузить скриншот графика</label>
+    <input id="imageInput" type="file" accept="image/*">
+
+    <div id="status" class="status"></div>
+
+    <div id="result" class="result">
+      <p id="signal" class="signal">—</p>
+      <p id="confidence" class="conf"></p>
+      <p id="reasoning" class="why"></p>
+    </div>
+
+    <div id="partner" class="partner">
+      <a id="partnerLink" href="#" target="_blank" rel="noopener noreferrer">Открыть Pocket Option</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    tg.expand();
+    tg.ready();
+    tg.setHeaderColor("#05070d");
+    tg.setBackgroundColor("#05070d");
+  }
+
+  const API_BASE = window.location.hostname === "localhost"
+    ? "http://localhost:8000"
+    : "http://127.0.0.1:8000";
+
+  const imageInput = document.getElementById("imageInput");
+  const statusEl = document.getElementById("status");
+  const resultEl = document.getElementById("result");
+  const signalEl = document.getElementById("signal");
+  const confidenceEl = document.getElementById("confidence");
+  const reasoningEl = document.getElementById("reasoning");
+  const partnerWrapEl = document.getElementById("partner");
+  const partnerLinkEl = document.getElementById("partnerLink");
+
+  imageInput.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    statusEl.textContent = "Анализируем изображение...";
+    resultEl.style.display = "none";
+    partnerWrapEl.style.display = "none";
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(`${API_BASE}/analyze`, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || "Ошибка анализа");
+      }
+
+      const isUp = data.direction === "UP";
+      signalEl.textContent = isUp ? "СИГНАЛ: ВВЕРХ" : "СИГНАЛ: ВНИЗ";
+      signalEl.className = `signal ${isUp ? "up" : "down"}`;
+      confidenceEl.textContent = `Уверенность: ${data.confidence}%`;
+      reasoningEl.textContent = data.reasoning || "";
+
+      partnerLinkEl.href = data.partner_link || "https://pocketoption.com";
+
+      resultEl.style.display = "block";
+      partnerWrapEl.style.display = "block";
+      statusEl.textContent = "Готово.";
+
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+    } catch (error) {
+      statusEl.textContent = `Ошибка: ${error.message}`;
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
+    }
+  });
+
+  // Matrix animation
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
+  const glyphs = "01アイウエオカキクケコサシスセソ1234567890BTCUSDT▲▼";
+  let columns = [];
+  let fontSize = 14;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const count = Math.floor(canvas.width / fontSize);
+    columns = new Array(count).fill(0).map(() => Math.random() * canvas.height / fontSize);
+  }
+
+  function draw() {
+    ctx.fillStyle = "rgba(5, 7, 13, 0.08)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = `${fontSize}px monospace`;
+
+    for (let i = 0; i < columns.length; i++) {
+      const text = glyphs[Math.floor(Math.random() * glyphs.length)];
+      const x = i * fontSize;
+      const y = columns[i] * fontSize;
+
+      const green = 120 + Math.floor(Math.random() * 110);
+      ctx.fillStyle = `rgb(20, ${green}, 80)`;
+      ctx.fillText(text, x, y);
+
+      if (y > canvas.height && Math.random() > 0.975) columns[i] = 0;
+      columns[i] += 1;
+    }
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+  setInterval(draw, 40);
+</script>
+</body>
+</html>
