@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+node_modules/
+.vscode/
+.idea/
+*.log
+backend/
+bot.py
+requirements.txt
+render.yaml
