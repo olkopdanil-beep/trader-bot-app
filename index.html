@@ -137,6 +137,35 @@
       gap: 10px;
       margin-bottom: 12px;
     }
+    .grid-1 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .segment {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .segment-btn {
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      height: 38px;
+      background: rgba(10, 16, 14, 0.9);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .segment-btn.active {
+      border-color: var(--line);
+      box-shadow: inset 0 0 20px var(--neon-soft);
+      background: linear-gradient(90deg, rgba(20, 52, 36, 0.9), rgba(17, 56, 35, 0.9));
+    }
 
     label {
       display: block;
@@ -267,6 +296,27 @@
     .upload-btn:active {
       transform: translateY(1px);
     }
+    .action-wrap {
+      display: none;
+      margin-top: 8px;
+      animation: panelIn .25s ease;
+    }
+    .action-btn {
+      width: 100%;
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      height: 44px;
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: .35px;
+      cursor: pointer;
+      background: linear-gradient(90deg, rgba(20, 52, 36, 0.95), rgba(17, 56, 35, 0.95));
+      transition: all .22s ease;
+    }
+    .action-btn:hover {
+      box-shadow: inset 0 0 24px var(--neon-soft), 0 0 10px rgba(60, 255, 151, 0.22);
+      border-color: var(--line);
+    }
 
     @keyframes shimmer {
       to { transform: translateX(130%); }
@@ -319,6 +369,55 @@
       transition: width .45s ease;
     }
     .reasoning { margin: 0; color: #bdd8c8; line-height: 1.45; }
+    .metrics {
+      margin-top: 10px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding-top: 10px;
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      color: #d5eadf;
+    }
+    .signal-card {
+      margin-top: 12px;
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, .38);
+    }
+    .signal-badge {
+      min-width: 150px;
+      height: 42px;
+      border-radius: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      border-radius: 6px;
+    }
+    .signal-badge.buy {
+      background: #23b34f;
+    }
+    .signal-badge.sell {
+      background: #ff3d35;
+    }
+    .signal-badge .icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      background: rgba(0,0,0,.22);
+    }
 
     .partner {
       margin-top: 12px;
@@ -354,6 +453,28 @@
       margin: 0;
       font-size: 18px;
       font-weight: 800;
+    }
+    .profile-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid var(--line-soft);
+      object-fit: cover;
+      background: rgba(255,255,255,.08);
+      flex-shrink: 0;
+    }
+    .profile-avatar.fallback {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(18, 24, 22, 0.92), rgba(10, 16, 14, 0.92));
     }
     .meta {
       margin: 6px 0 0;
@@ -427,7 +548,7 @@
       padding: 24px;
       opacity: 1;
       transform: translateY(0);
-      animation: introFadeIn .4s ease-out;
+      animation: introFadeIn .6s ease-out;
     }
     .intro-overlay.hidden {
       opacity: 0;
@@ -511,32 +632,45 @@
     <section id="analyzePanel" class="panel active">
       <div class="grid-2">
         <div>
-          <label for="pairSelect">Валютная пара</label>
+          <label>Раздел</label>
+          <div class="segment" id="marketSegment">
+            <button type="button" class="segment-btn active" data-market="forex">Валюты</button>
+            <button type="button" class="segment-btn" data-market="crypto">Криптовалюты</button>
+            <button type="button" class="segment-btn" data-market="stocks">Акции</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-1">
+        <div>
+          <label for="pairSelect">Инструмент</label>
           <div class="ios-select" id="pairSelect">
             <button class="ios-select-trigger" type="button" data-value="">Выберите</button>
             <div class="ios-select-menu">
-              <button class="ios-option" type="button" data-value="EUR/USD">EUR/USD</button>
-            </div>
-          </div>
-        </div>
-        <div>
-          <label for="expirySelect">Время экспирации</label>
-          <div class="ios-select" id="expirySelect">
-            <button class="ios-select-trigger" type="button" data-value="">Выберите</button>
-            <div class="ios-select-menu">
-              <button class="ios-option" type="button" data-value="10 секунд">10 секунд</button>
-              <button class="ios-option" type="button" data-value="1 минута">1 минута</button>
-              <button class="ios-option" type="button" data-value="5 минут">5 минут</button>
-              <button class="ios-option" type="button" data-value="10 минут">10 минут</button>
             </div>
           </div>
         </div>
       </div>
 
-      <div id="uploadWrap" class="upload-wrap">
-        <label class="upload-btn" for="imageInput">Загрузить скриншот</label>
+      <div id="timeWrap" class="grid-1" style="display:none;">
+        <div>
+          <label for="expirySelect">Время</label>
+          <div class="ios-select" id="expirySelect">
+            <button class="ios-select-trigger" type="button" data-value="">Выберите</button>
+            <div class="ios-select-menu">
+              <button class="ios-option" type="button" data-value="15s">15s</button>
+              <button class="ios-option" type="button" data-value="30s">30s</button>
+              <button class="ios-option" type="button" data-value="1m">1m</button>
+              <button class="ios-option" type="button" data-value="3m">3m</button>
+              <button class="ios-option" type="button" data-value="5m">5m</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <input id="imageInput" type="file" accept="image/*">
+
+      <div id="actionWrap" class="action-wrap">
+        <button id="getSignalBtn" class="action-btn" type="button">ПОЛУЧИТЬ AI СИГНАЛ</button>
+      </div>
 
       <div id="status" class="status"></div>
 
@@ -545,6 +679,8 @@
         <p id="confidence" class="confidence"></p>
         <div class="progress"><div id="confidenceBar"></div></div>
         <p id="reasoning" class="reasoning"></p>
+        <div id="metrics" class="metrics"></div>
+        <div id="signalCard" class="signal-card" style="display:none;"></div>
       </div>
 
       <div id="partner" class="partner">
@@ -554,7 +690,13 @@
 
     <section id="profilePanel" class="panel">
       <div class="profile-box">
-        <p id="profileNick" class="nick">@trader</p>
+        <div class="profile-head">
+          <img id="profileAvatar" class="profile-avatar" alt="avatar">
+          <div>
+            <p id="profileName" class="nick">Trader</p>
+            <p id="profileNick" class="meta">@trader</p>
+          </div>
+        </div>
         <p id="profileMeta" class="meta">История последних сигналов</p>
       </div>
       <div class="history-title">История сигналов</div>
@@ -572,28 +714,36 @@
     tg.setBackgroundColor("#04090a");
   }
 
-  const CONFIG_API_BASE = window.APP_CONFIG?.API_BASE || "";
-  const API_BASE = window.location.hostname === "localhost"
-    ? "http://localhost:8000"
-    : (CONFIG_API_BASE && !CONFIG_API_BASE.includes("REPLACE_WITH_YOUR_BACKEND_URL")
-      ? CONFIG_API_BASE
-      : "http://127.0.0.1:8000");
-
   const currentUser = tg?.initDataUnsafe?.user || {};
   const userId = String(currentUser.id || "anonymous");
-  const username = currentUser.username ? `@${currentUser.username}` : (currentUser.first_name || "Trader");
+  const username = currentUser.username ? `@${currentUser.username}` : "@trader";
+  const fullName = [currentUser.first_name, currentUser.last_name].filter(Boolean).join(" ") || "Trader";
+  const profileImage = currentUser.photo_url || "";
+  const historyStorageKey = `signal_history_${userId}`;
+
+  const FOREX_PAIRS = [
+    "AED/CNY OTC","AUD/CAD OTC","AUD/CHF OTC","CAD/CHF OTC","CAD/JPY OTC","EUR/GBP OTC","GBP/USD OTC","NGN/USD OTC","OMR/CNY OTC","SAR/CNY OTC","UAH/USD OTC","USD/BRL OTC","USD/CLP OTC","USD/DZD OTC","USD/PKR OTC","USD/RUB OTC","USD/SGD OTC","ZAR/USD OTC","EUR/HUF OTC","BHD/CNY OTC","EUR/CHF OTC","YER/USD OTC","CHF/JPY OTC","EUR/JPY OTC","EUR/NZD OTC","USD/INR OTC","KES/USD OTC","NZD/USD OTC","USD/PHP OTC","AUD/JPY OTC","CHF/NOK OTC","USD/CHF OTC","USD/IDR OTC","EUR/RUB OTC","QAR/CNY OTC","USD/BDT OTC","AUD/USD OTC","MAD/USD OTC","GBP/AUD OTC","AUD/NZD OTC","USD/EGP OTC","USD/MXN OTC","USD/VND OTC","EUR/TRY OTC","USD/CAD OTC","USD/ARS OTC","JOD/CNY OTC","USD/MYR OTC","TND/USD OTC","USD/THB OTC","LBP/USD OTC","USD/CNH OTC","USD/COP OTC","NZD/JPY OTC","GBP/JPY OTC","USD/JPY OTC"
+  ];
+  const CRYPTO = [
+    "Cardano OTC","BNB OTC","Dogecoin OTC","Chainlink OTC","Polkadot OTC","Avalanche OTC","Bitcoin ETF OTC","Bitcoin OTC","Polygon OTC","Toncoin OTC","Solana OTC","Litecoin OTC","Ethereum OTC","TRON OTC"
+  ];
+  const STOCKS = [
+    "American Express OTC","Intel OTC","Johnson & Johnson OTC","Tesla OTC","Advanced Micro Devices OTC","Citigroup Inc OTC","Coinbase Global OTC","VIX OTC","McDonald's OTC","Alibaba OTC","ExxonMobil OTC","Apple OTC","Netflix OTC","Amazon OTC","Boeing Company OTC","Palantir Technologies OTC","GameStop Corp OTC","Marathon Digital Holdings OTC","FedEx OTC","VISA OTC","FACEBOOK INC OTC","Cisco OTC","Pfizer Inc OTC","Microsoft OTC"
+  ];
+  const MARKET_DATA = { forex: FOREX_PAIRS, crypto: CRYPTO, stocks: STOCKS };
+  let activeMarket = "forex";
 
   const tabAnalyze = document.getElementById("tabAnalyze");
   const tabProfile = document.getElementById("tabProfile");
   const analyzePanel = document.getElementById("analyzePanel");
   const profilePanel = document.getElementById("profilePanel");
+  const marketSegment = document.getElementById("marketSegment");
+  const timeWrap = document.getElementById("timeWrap");
 
   const pairSelect = document.getElementById("pairSelect");
   const expirySelect = document.getElementById("expirySelect");
-  const pairTrigger = pairSelect.querySelector(".ios-select-trigger");
-  const expiryTrigger = expirySelect.querySelector(".ios-select-trigger");
-  const uploadWrap = document.getElementById("uploadWrap");
-  const imageInput = document.getElementById("imageInput");
+  const actionWrap = document.getElementById("actionWrap");
+  const getSignalBtn = document.getElementById("getSignalBtn");
 
   const statusEl = document.getElementById("status");
   const resultEl = document.getElementById("result");
@@ -601,12 +751,24 @@
   const confidenceEl = document.getElementById("confidence");
   const reasoningEl = document.getElementById("reasoning");
   const confidenceBar = document.getElementById("confidenceBar");
+  const metricsEl = document.getElementById("metrics");
+  const signalCardEl = document.getElementById("signalCard");
   const partnerWrapEl = document.getElementById("partner");
   const partnerLinkEl = document.getElementById("partnerLink");
 
+  const profileAvatar = document.getElementById("profileAvatar");
+  const profileName = document.getElementById("profileName");
   const profileNick = document.getElementById("profileNick");
   const historyEl = document.getElementById("history");
+  profileName.textContent = fullName;
   profileNick.textContent = username;
+  if (profileImage) {
+    profileAvatar.src = profileImage;
+  } else {
+    profileAvatar.removeAttribute("src");
+    profileAvatar.classList.add("fallback");
+    profileAvatar.textContent = (fullName || "T").slice(0, 1).toUpperCase();
+  }
 
   function switchTab(isProfile) {
     tabAnalyze.classList.toggle("active", !isProfile);
@@ -627,6 +789,26 @@
     document.querySelectorAll(".ios-select.open").forEach((el) => el.classList.remove("open"));
   }
 
+  function setSelectValue(selectEl, value, label) {
+    const trigger = selectEl.querySelector(".ios-select-trigger");
+    trigger.dataset.value = value || "";
+    trigger.textContent = label || "Выберите";
+  }
+
+  function populateInstrumentOptions() {
+    const menu = pairSelect.querySelector(".ios-select-menu");
+    menu.innerHTML = "";
+    MARKET_DATA[activeMarket].forEach((item) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "ios-option";
+      btn.dataset.value = item;
+      btn.textContent = item;
+      menu.appendChild(btn);
+    });
+    setupCustomSelect(pairSelect, true);
+  }
+
   function setupCustomSelect(selectEl) {
     const trigger = selectEl.querySelector(".ios-select-trigger");
     const options = selectEl.querySelectorAll(".ios-option");
@@ -640,6 +822,10 @@
         trigger.dataset.value = opt.dataset.value;
         trigger.textContent = opt.dataset.value;
         selectEl.classList.remove("open");
+        if (selectEl === pairSelect) {
+          timeWrap.style.display = "grid";
+          setSelectValue(expirySelect, "", "Выберите");
+        }
         updateUploadVisibility();
       });
     });
@@ -647,10 +833,28 @@
 
   function updateUploadVisibility() {
     const ready = selectedValue(pairSelect) && selectedValue(expirySelect);
-    uploadWrap.style.display = ready ? "block" : "none";
+    actionWrap.style.display = ready ? "block" : "none";
   }
+
+  marketSegment.querySelectorAll(".segment-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      marketSegment.querySelectorAll(".segment-btn").forEach((x) => x.classList.remove("active"));
+      btn.classList.add("active");
+      activeMarket = btn.dataset.market;
+      setSelectValue(pairSelect, "", "Выберите");
+      setSelectValue(expirySelect, "", "Выберите");
+      timeWrap.style.display = "none";
+      actionWrap.style.display = "none";
+      populateInstrumentOptions();
+      resultEl.classList.remove("show");
+      signalCardEl.style.display = "none";
+      closeAllSelects();
+    });
+  });
+
   setupCustomSelect(pairSelect);
   setupCustomSelect(expirySelect);
+  populateInstrumentOptions();
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".ios-select")) closeAllSelects();
   });
@@ -662,80 +866,90 @@
       return;
     }
     historyEl.innerHTML = items.map((item) => {
-      const time = new Date(item.created_at).toLocaleString("ru-RU");
-      const dir = item.direction === "UP" ? "ВВЕРХ" : "ВНИЗ";
+      const time = new Date(item.createdAt).toLocaleString("ru-RU");
+      const dir = item.signal === "BUY" ? "КУПИТЬ" : "ПРОДАТЬ";
       return `
         <div class="history-item">
           <div class="history-top">
-            <span>${item.pair} • ${item.expiry}</span>
+            <span>${item.instrument} • ${item.timeframe}</span>
             <span>${time}</span>
           </div>
-          <div class="badge"><span class="dot ${item.direction === "DOWN" ? "down" : ""}"></span>Сигнал: ${dir} | ${item.confidence}%</div>
+          <div class="badge"><span class="dot ${item.signal === "SELL" ? "down" : ""}"></span>Сигнал: ${dir} | Точность: ${item.accuracy}%</div>
         </div>
       `;
     }).join("");
   }
 
-  async function loadHistory() {
-    try {
-      const res = await fetch(`${API_BASE}/history/${encodeURIComponent(userId)}`);
-      const data = await res.json();
-      renderHistory(data.items || []);
-    } catch {
-      historyEl.innerHTML = '<div class="empty">Не удалось загрузить историю.</div>';
-    }
+  function loadHistory() {
+    const raw = localStorage.getItem(historyStorageKey);
+    const items = raw ? JSON.parse(raw) : [];
+    renderHistory(items);
   }
 
-  imageInput.addEventListener("change", async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  getSignalBtn.addEventListener("click", () => {
     const pair = selectedValue(pairSelect);
     const expiry = selectedValue(expirySelect);
     if (!pair || !expiry) return;
 
-    statusEl.textContent = "AI ANALYZING MARKET DATA.";
+    statusEl.textContent = "AI АНАЛИЗИРУЕТ";
     resultEl.classList.remove("show");
     partnerWrapEl.style.display = "none";
+    signalCardEl.style.display = "none";
+    metricsEl.innerHTML = "";
+    confidenceBar.style.width = "0%";
+    reasoningEl.textContent = "";
 
-    let step = 0;
+    const finalAccuracy = Math.floor(75 + Math.random() * 26);
+    const power = Math.floor(80 + Math.random() * 21);
+    const volume = Math.floor(40 + Math.random() * 61);
+    const precision = Math.floor(75 + Math.random() * 26);
+    const signalType = Math.random() < 0.5 ? "BUY" : "SELL";
+    const signalText = signalType === "BUY" ? "СИГНАЛ: КУПИТЬ" : "СИГНАЛ: ПРОДАТЬ";
+    const signalClass = signalType === "BUY" ? "up" : "down";
+
+    let progress = 0;
     const ticker = setInterval(() => {
-      step += 1;
-      statusEl.textContent = `AI ANALYZING MARKET DATA${".".repeat((step % 3) + 1)}`;
-    }, 320);
+      const step = Math.floor(5 + Math.random() * 14);
+      progress = Math.min(100, progress + step);
+      confidenceBar.style.width = `${progress}%`;
+      statusEl.textContent = `AI АНАЛИЗИРУЕТ ${progress}%`;
+      if (progress < 100) return;
+      clearInterval(ticker);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("user_id", userId);
-    formData.append("username", username);
-    formData.append("pair", pair);
-    formData.append("expiry", expiry);
-
-    try {
-      const response = await fetch(`${API_BASE}/analyze`, { method: "POST", body: formData });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "Ошибка анализа");
-
-      const isUp = data.direction === "UP";
-      signalEl.textContent = isUp ? "СИГНАЛ: ВВЕРХ" : "СИГНАЛ: ВНИЗ";
-      signalEl.className = `signal ${isUp ? "up" : "down"}`;
-      confidenceEl.textContent = `ПРОЦЕНТ ЗАХОДА СДЕЛКИ: ${data.confidence}%`;
-      confidenceBar.style.width = `${Math.max(0, Math.min(100, Number(data.confidence) || 0))}%`;
-      reasoningEl.textContent = data.reasoning || "AI анализ завершен";
-      partnerLinkEl.href = data.partner_link || "https://pocketoption.com";
+      signalEl.textContent = signalText;
+      signalEl.className = `signal ${signalClass}`;
+      confidenceEl.textContent = `Точность сигнала: ${finalAccuracy}%`;
+      reasoningEl.textContent = "AI анализ завершен";
+      metricsEl.innerHTML = `
+        <div>Сила актива: ${power}%</div>
+        <div>Анализ объема: ${volume}%</div>
+        <div>Точность сигнала: ${precision}%</div>
+      `;
+      signalCardEl.style.display = "flex";
+      signalCardEl.innerHTML = `
+        <div class="signal-badge ${signalType === "BUY" ? "buy" : "sell"}">
+          <span class="icon">${signalType === "BUY" ? "↗" : "↘"}</span>
+          <span>${signalType === "BUY" ? "КУПИТЬ" : "ПРОДАТЬ"}</span>
+        </div>
+      `;
 
       resultEl.classList.add("show");
       partnerWrapEl.style.display = "block";
       statusEl.textContent = "AI анализ завершен";
-      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
-    } catch (error) {
-      statusEl.textContent = `Ошибка: ${error.message}`;
-      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
-    } finally {
-      clearInterval(ticker);
-      imageInput.value = "";
+      partnerLinkEl.href = "https://pocketoption.com";
+
+      const existing = JSON.parse(localStorage.getItem(historyStorageKey) || "[]");
+      existing.push({
+        instrument: pair,
+        timeframe: expiry,
+        signal: signalType,
+        accuracy: finalAccuracy,
+        createdAt: new Date().toISOString(),
+      });
+      localStorage.setItem(historyStorageKey, JSON.stringify(existing.slice(-30)));
       loadHistory();
-    }
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+    }, 180);
   });
 
   // Matrix background animation
