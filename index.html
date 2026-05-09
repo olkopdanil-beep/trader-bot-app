@@ -47,6 +47,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: filter .35s ease, opacity .35s ease;
+    }
+
+    .screen.blurred {
+      filter: blur(10px) brightness(0.45);
+      opacity: .72;
+      pointer-events: none;
     }
 
     .app {
@@ -463,14 +470,6 @@
       transform: translateY(1px) scale(0.99);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
     }
-    .intro-exit {
-      margin-top: 14px;
-      font-size: 12px;
-      color: var(--muted);
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
     .intro-noise {
       position: absolute;
       inset: 0;
@@ -493,12 +492,11 @@
   <div style="position: relative; z-index: 1; text-align: center;">
     <p class="intro-title">КАМПУС ТРЕЙДЕРА</p>
     <p class="intro-subtitle">matrix trade environment</p>
-    <button id="introStart" class="intro-btn" type="button">Войти в систему</button>
-    <div id="introExit" class="intro-exit">Выйти из системы</div>
+    <button id="introStart" class="intro-btn" type="button">НАЧАТЬ</button>
   </div>
 </div>
 
-<div class="screen">
+<div id="mainScreen" class="screen">
   <div class="app">
     <div class="head">
       <h1 class="title">Matrix Trade Analyzer</h1>
@@ -778,24 +776,28 @@
 
   const introOverlay = document.getElementById("introOverlay");
   const introStart = document.getElementById("introStart");
-  const introExit = document.getElementById("introExit");
+  const mainScreen = document.getElementById("mainScreen");
 
   function hideIntro() {
     if (!introOverlay || introOverlay.classList.contains("hidden")) return;
     introOverlay.classList.add("hidden");
+    canvas.classList.remove("blurred");
+    mainScreen.classList.remove("blurred");
     setTimeout(() => {
       if (introOverlay.parentNode) introOverlay.parentNode.removeChild(introOverlay);
     }, 380);
   }
 
+  function showIntro() {
+    canvas.classList.add("blurred");
+    mainScreen.classList.add("blurred");
+    introOverlay.classList.remove("hidden");
+  }
+  showIntro();
+
   introStart.addEventListener("click", () => {
     hideIntro();
     if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
-  });
-
-  introExit.addEventListener("click", () => {
-    if (tg?.close) tg.close();
-    else window.close();
   });
 </script>
 </body>
