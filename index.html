@@ -546,40 +546,208 @@
       position: fixed;
       inset: 0;
       z-index: 5;
-      background: radial-gradient(circle at top, rgba(67, 255, 159, 0.09), transparent 45%), rgba(2, 5, 5, 0.96);
+      background: #000;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 24px;
       opacity: 1;
-      transform: translateY(0);
-      animation: introFadeIn .6s ease-out;
     }
     .intro-overlay.hidden {
       opacity: 0;
-      transform: translateY(10px);
       pointer-events: none;
-      transition: opacity .35s ease, transform .35s ease;
+      transition: opacity .4s ease;
     }
-    .intro-title {
-      font-size: 30px;
+
+    /* noise scanlines */
+    .intro-noise {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 3px);
+      mix-blend-mode: screen;
+      opacity: .6;
+    }
+
+    /* ── CALIX logo wrapper ── */
+    .calix-wrap {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 48px;
+      height: 120px;
+    }
+
+    /* The C letter — starts normal, then scales up */
+    .calix-c {
+      font-size: 96px;
       font-weight: 900;
-      letter-spacing: 0.6rem;
-      text-transform: uppercase;
-      text-align: center;
-      margin: 0 0 10px;
-      text-shadow: 0 0 18px rgba(67, 255, 159, 0.55);
+      color: #fff;
+      letter-spacing: 0;
+      line-height: 1;
+      position: relative;
+      display: inline-block;
+      opacity: 0;
+      transform: scale(0.7);
+      text-shadow: 0 0 40px rgba(67,255,159,0.0);
+      /* shine overlay */
+      overflow: hidden;
     }
-    .intro-subtitle {
-      margin: 0 0 26px;
-      font-size: 13px;
+    .calix-c::after {
+      content: "";
+      position: absolute;
+      left: -60%;
+      top: -20%;
+      width: 40%;
+      height: 140%;
+      background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
+      transform: skewX(-15deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ALIX letters — fade out */
+    .calix-alix {
+      font-size: 96px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0;
+      line-height: 1;
+      display: inline-block;
+      opacity: 0;
+      position: relative;
+    }
+
+    /* full CALIX for glitch phase */
+    .calix-full {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 96px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 6px;
       text-transform: uppercase;
-      letter-spacing: .35rem;
+      opacity: 0;
+      user-select: none;
+    }
+    /* chromatic aberration layers */
+    .calix-full::before,
+    .calix-full::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 96px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      opacity: 0.55;
+      mix-blend-mode: screen;
+    }
+    .calix-full::before {
+      color: #ff2244;
+      clip-path: inset(0 0 0 0);
+    }
+    .calix-full::after {
+      color: #2266ff;
+      clip-path: inset(0 0 0 0);
+    }
+
+    /* ── ANIMATIONS ── */
+
+    /* 1. flicker in */
+    @keyframes calixFlicker {
+      0%   { opacity: 0; }
+      8%   { opacity: 0.9; }
+      12%  { opacity: 0.1; }
+      16%  { opacity: 1; }
+      20%  { opacity: 0.4; }
+      24%  { opacity: 1; }
+      30%  { opacity: 0.7; }
+      35%  { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    /* 2. glitch displacement on full word */
+    @keyframes calixGlitch {
+      0%,100% { transform: translate(0,0); clip-path: inset(0 0 100% 0); }
+      10% { transform: translate(-4px, 0); clip-path: inset(20% 0 60% 0); }
+      12% { transform: translate(4px, 0);  clip-path: inset(55% 0 20% 0); }
+      14% { transform: translate(0, 0);    clip-path: inset(0 0 100% 0); }
+      40% { transform: translate(0, 0);    clip-path: inset(30% 0 50% 0); }
+      42% { transform: translate(-6px,0);  clip-path: inset(30% 0 50% 0); }
+      44% { transform: translate(0, 0);    clip-path: inset(0 0 100% 0); }
+      70% { transform: translate(0, 0);    clip-path: inset(10% 0 70% 0); }
+      72% { transform: translate(5px, 0);  clip-path: inset(10% 0 70% 0); }
+      74% { transform: translate(0, 0);    clip-path: inset(0 0 100% 0); }
+    }
+    @keyframes calixGlitchR {
+      0%,100% { transform: translate(0,0); }
+      10% { transform: translate(5px, -1px); }
+      12% { transform: translate(-3px, 1px); }
+      14% { transform: translate(0,0); }
+      40% { transform: translate(4px, 0); }
+      42% { transform: translate(-4px, 0); }
+      44% { transform: translate(0,0); }
+    }
+    @keyframes calixGlitchB {
+      0%,100% { transform: translate(0,0); }
+      10% { transform: translate(-5px, 1px); }
+      12% { transform: translate(3px, -1px); }
+      14% { transform: translate(0,0); }
+      40% { transform: translate(-4px, 0); }
+      42% { transform: translate(4px, 0); }
+      44% { transform: translate(0,0); }
+    }
+
+    /* 3. C scale up */
+    @keyframes calixCAppear {
+      0%   { opacity: 0; transform: scale(0.7); text-shadow: 0 0 0 rgba(67,255,159,0); }
+      60%  { opacity: 1; transform: scale(1.18); text-shadow: 0 0 60px rgba(67,255,159,0.5); }
+      100% { opacity: 1; transform: scale(1.0);  text-shadow: 0 0 30px rgba(67,255,159,0.25); }
+    }
+
+    /* 4. ALIX fade out */
+    @keyframes calixAlixOut {
+      0%   { opacity: 1; transform: translateX(0); }
+      60%  { opacity: 0; transform: translateX(18px); }
+      100% { opacity: 0; transform: translateX(18px); }
+    }
+
+    /* 5. shine sweep on C */
+    @keyframes calixShine {
+      0%   { left: -60%; opacity: 0; }
+      10%  { opacity: 1; }
+      100% { left: 130%; opacity: 0; }
+    }
+
+    /* 6. subtitle + button fade in */
+    @keyframes introFadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .intro-subtitle {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 32px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .4rem;
       color: var(--muted);
       text-align: center;
+      opacity: 0;
     }
     .intro-btn {
+      position: relative;
+      z-index: 1;
       min-width: 220px;
       border-radius: 999px;
       border: 1px solid var(--line);
@@ -588,26 +756,15 @@
       font-weight: 800;
       font-size: 13px;
       text-transform: uppercase;
-      padding: 11px 22px;
+      padding: 13px 28px;
       cursor: pointer;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
       transition: transform .18s ease, box-shadow .18s ease;
+      opacity: 0;
     }
     .intro-btn:active {
       transform: translateY(1px) scale(0.99);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
-    }
-    .intro-noise {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 2px);
-      mix-blend-mode: screen;
-      opacity: .7;
-    }
-    @keyframes introFadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -616,11 +773,17 @@
 
 <div id="introOverlay" class="intro-overlay">
   <div class="intro-noise"></div>
-  <div style="position: relative; z-index: 1; text-align: center;">
-    <p class="intro-title">КАМПУС ТРЕЙДЕРА</p>
-    <p class="intro-subtitle">matrix trade environment</p>
-    <button id="introStart" class="intro-btn" type="button">НАЧАТЬ</button>
+
+  <!-- glitch phase: full CALIX word -->
+  <div class="calix-wrap">
+    <div id="calixFull" class="calix-full" data-text="CALIX">CALIX</div>
+
+    <!-- split phase: C stays, ALIX flies out -->
+    <span id="calixC" class="calix-c">C</span><span id="calixAlix" class="calix-alix">ALIX</span>
   </div>
+
+  <p class="intro-subtitle" id="introSub">AI TRADE ENVIRONMENT</p>
+  <button id="introStart" class="intro-btn" type="button">НАЧАТЬ</button>
 </div>
 
 <div id="mainScreen" class="screen">
@@ -1002,6 +1165,10 @@
   const introOverlay = document.getElementById("introOverlay");
   const introStart = document.getElementById("introStart");
   const mainScreen = document.getElementById("mainScreen");
+  const calixFull = document.getElementById("calixFull");
+  const calixC = document.getElementById("calixC");
+  const calixAlix = document.getElementById("calixAlix");
+  const introSub = document.getElementById("introSub");
 
   function hideIntro() {
     if (!introOverlay || introOverlay.classList.contains("hidden")) return;
@@ -1010,15 +1177,87 @@
     mainScreen.classList.remove("blurred");
     setTimeout(() => {
       if (introOverlay.parentNode) introOverlay.parentNode.removeChild(introOverlay);
-    }, 380);
+    }, 420);
   }
 
-  function showIntro() {
+  function runIntroSequence() {
     canvas.classList.add("blurred");
     mainScreen.classList.add("blurred");
-    introOverlay.classList.remove("hidden");
+
+    // ── Phase 1: CALIX glitch flicker in (0ms → 900ms) ──
+    calixFull.style.opacity = "0";
+    calixC.style.opacity = "0";
+    calixAlix.style.opacity = "0";
+
+    setTimeout(() => {
+      // flicker in
+      calixFull.style.animation = "calixFlicker 0.9s ease forwards";
+      calixFull.style.opacity = "1";
+
+      // chromatic aberration on pseudo-elements via class
+      calixFull.classList.add("glitching");
+    }, 80);
+
+    // ── Phase 2: glitch displacement (300ms → 1200ms) ──
+    setTimeout(() => {
+      calixFull.style.setProperty("--glitch-active", "1");
+      // trigger glitch via inline style animation override
+      calixFull.style.animation = "calixFlicker 0.9s ease forwards";
+      calixFull.querySelector && null; // noop
+      // apply glitch to ::before ::after via a style tag trick
+      const glitchStyle = document.createElement("style");
+      glitchStyle.id = "glitch-active-style";
+      glitchStyle.textContent = `
+        .calix-full::before { animation: calixGlitchR 1.1s steps(1) infinite; }
+        .calix-full::after  { animation: calixGlitchB 1.1s steps(1) infinite; }
+      `;
+      document.head.appendChild(glitchStyle);
+    }, 300);
+
+    // ── Phase 3: ALIX flies out, C scales up (1400ms) ──
+    setTimeout(() => {
+      // remove glitch style
+      const gs = document.getElementById("glitch-active-style");
+      if (gs) gs.remove();
+
+      // show split letters at same position as full word
+      calixC.style.opacity = "1";
+      calixAlix.style.opacity = "1";
+      // hide full word
+      calixFull.style.transition = "opacity 0.05s";
+      calixFull.style.opacity = "0";
+
+      // ALIX out
+      calixAlix.style.animation = "calixAlixOut 0.55s cubic-bezier(0.4,0,1,1) forwards";
+
+      // C scale up
+      calixC.style.animation = "calixCAppear 0.7s cubic-bezier(0.22,1,0.36,1) forwards";
+    }, 1400);
+
+    // ── Phase 4: shine sweep on C (2200ms) ──
+    setTimeout(() => {
+      calixC.style.overflow = "hidden";
+      calixC.querySelector && null;
+      // trigger ::after shine
+      const shineStyle = document.createElement("style");
+      shineStyle.id = "shine-style";
+      shineStyle.textContent = `
+        .calix-c::after { animation: calixShine 0.7s ease forwards; opacity: 1; }
+      `;
+      document.head.appendChild(shineStyle);
+    }, 2200);
+
+    // ── Phase 5: subtitle + button appear (2700ms) ──
+    setTimeout(() => {
+      introSub.style.animation = "introFadeUp 0.5s ease forwards";
+    }, 2700);
+
+    setTimeout(() => {
+      introStart.style.animation = "introFadeUp 0.5s ease forwards";
+    }, 2950);
   }
-  showIntro();
+
+  runIntroSequence();
 
   introStart.addEventListener("click", () => {
     hideIntro();
