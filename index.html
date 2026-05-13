@@ -7,37 +7,52 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="./config.js"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
     :root {
-      --bg: #020505;
-      --glass: rgba(0, 0, 0, 0.6);
-      --line: rgba(58, 255, 142, 0.4);
-      --line-soft: rgba(86, 104, 96, 0.35);
-      --text: #eafff2;
-      --muted: #98aa9f;
-      --neon: #43ff9f;
-      --neon-soft: rgba(67, 255, 159, 0.3);
-      --danger: #ff617f;
-      --ok: #35e386;
-      --hud-dark: rgba(5, 11, 9, 0.7);
+      /* Stealth Wealth — Obsidian Black palette */
+      --bg:            #080a0a;
+      --surface:       rgba(12, 14, 14, 0.82);
+      --surface-raised: rgba(16, 19, 19, 0.90);
+      --line:          rgba(255, 255, 255, 0.07);
+      --line-accent:   rgba(67, 255, 159, 0.22);
+      --text:          #e8ede9;
+      --text-secondary: #6b7c72;
+      --neon:          #3dffa0;
+      --neon-soft:     rgba(61, 255, 160, 0.12);
+      --neon-glow:     rgba(61, 255, 160, 0.06);
+      --danger:        #ff4d6a;
+      --ok:            #2ecc71;
+      --radius-card:   18px;
+      --radius-input:  12px;
+      --radius-btn:    10px;
+      --transition:    all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     html, body {
-      margin: 0;
       height: 100%;
       overflow: hidden;
-      background: var(--bg);
+      background: #000;
       color: var(--text);
-      font-family: Inter, Segoe UI, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
       -webkit-font-smoothing: antialiased;
       text-rendering: geometricPrecision;
     }
 
+    /* Matrix — внутри карточки, под контентом */
     #matrix {
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 0;
-      opacity: 0.25;
+      width: 100%;
+      height: 100%;
+      opacity: 0.45;
+      filter: blur(0.5px);
+      pointer-events: none;
     }
 
     .screen {
@@ -47,7 +62,7 @@
       height: 100vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 18px;
+      padding: 16px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -55,129 +70,154 @@
     }
 
     .screen.blurred {
-      filter: blur(10px) brightness(0.45);
-      opacity: .72;
+      filter: blur(10px) brightness(0.4);
+      opacity: .6;
       pointer-events: none;
     }
 
+    /* Main card — Obsidian Black */
     .app {
-      width: min(760px, 100%);
-      background: var(--glass);
-      border: 1px solid var(--line-soft);
-      border-radius: 22px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
-      padding: 18px;
+      width: min(720px, 100%);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03),
+        0 24px 64px rgba(0, 0, 0, 0.72),
+        0 4px 16px rgba(0, 0, 0, 0.5);
+      padding: 22px 20px;
     }
 
     .head {
-      margin-bottom: 14px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
     }
 
     .title {
-      margin: 0;
-      font-size: 27px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 16px rgba(67, 255, 159, 0.18);
+      color: var(--text);
+      text-shadow: none;
     }
 
     .subtitle {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      letter-spacing: 0.35px;
+      margin-top: 4px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
     .tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 6px;
+      margin-bottom: 16px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-btn);
+      padding: 4px;
     }
 
     .tab-btn {
-      border: 1px solid var(--line-soft);
-      color: var(--text);
-      background: var(--hud-dark);
-      border-radius: 12px;
-      height: 42px;
+      border: none;
+      color: var(--text-secondary);
+      background: transparent;
+      border-radius: 8px;
+      height: 36px;
       cursor: pointer;
-      font-weight: 700;
-      transition: all .22s ease;
-      letter-spacing: .25px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: var(--transition);
     }
 
     .tab-btn:hover {
-      box-shadow: inset 0 0 20px var(--neon-soft), 0 0 10px rgba(60, 255, 151, 0.22);
-      border-color: var(--line);
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
     }
 
     .tab-btn.active {
-      background: linear-gradient(90deg, rgba(20, 52, 36, 0.84), rgba(17, 56, 35, 0.84));
-      border-color: var(--line);
-      box-shadow: inset 0 0 24px var(--neon-soft);
+      background: var(--surface-raised);
+      color: var(--neon);
+      border: 1px solid var(--line-accent);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.4);
     }
 
     .panel {
       display: none;
-      border: 1px solid var(--line-soft);
-      border-radius: 15px;
-      background: rgba(7, 12, 10, 0.68);
-      backdrop-filter: blur(12px);
-      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      background: rgba(10, 12, 12, 0.6);
+      backdrop-filter: blur(16px);
+      padding: 18px;
     }
-    .panel.active { display: block; animation: panelIn .28s ease; }
+    .panel.active { display: block; animation: panelIn .24s ease; }
     @keyframes panelIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
     .grid-1 {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
     .segment {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 6px;
+      margin-bottom: 14px;
     }
     .segment-btn {
-      border: 1px solid var(--line-soft);
-      border-radius: 10px;
-      height: 38px;
-      background: rgba(10, 16, 14, 0.9);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-btn);
+      height: 36px;
+      background: rgba(0,0,0,0.25);
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
       cursor: pointer;
-      transition: all .2s ease;
+      transition: var(--transition);
+    }
+    .segment-btn:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
     }
     .segment-btn.active {
-      border-color: var(--line);
-      box-shadow: inset 0 0 20px var(--neon-soft);
-      background: linear-gradient(90deg, rgba(20, 52, 36, 0.9), rgba(17, 56, 35, 0.9));
+      border-color: var(--line-accent);
+      color: var(--neon);
+      background: rgba(61, 255, 160, 0.06);
+      box-shadow: inset 0 0 12px rgba(61,255,160,0.05);
     }
 
     label {
       display: block;
-      font-size: 12px;
-      color: #8ea89a;
-      margin-bottom: 4px;
+      font-size: 10px;
       font-weight: 600;
-      letter-spacing: .2px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
     }
 
     .ios-select {
@@ -186,55 +226,57 @@
     .ios-select-trigger {
       width: 100%;
       height: 44px;
-      border-radius: 14px;
-      border: 1px solid var(--line-soft);
-      background: linear-gradient(180deg, rgba(18, 24, 22, 0.92), rgba(10, 16, 14, 0.92));
+      border-radius: 0;
+      border: 1px solid rgba(61, 255, 160, 0.18);
+      background: #000;
       color: var(--text);
-      padding: 0 38px 0 12px;
+      padding: 0 40px 0 14px;
       outline: none;
-      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
       text-align: left;
       cursor: pointer;
-      transition: border-color .2s ease, box-shadow .2s ease, transform .18s ease;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+      transition: var(--transition);
+      position: relative;
     }
     .ios-select-trigger::after {
       content: "";
       position: absolute;
-      right: 14px;
+      right: 15px;
       top: 50%;
-      width: 8px;
-      height: 8px;
-      border-right: 2px solid #9fd8b8;
-      border-bottom: 2px solid #9fd8b8;
-      transform: translateY(-60%) rotate(45deg);
-      transition: transform .24s ease;
+      width: 7px;
+      height: 7px;
+      border-right: 1.5px solid var(--text-secondary);
+      border-bottom: 1.5px solid var(--text-secondary);
+      transform: translateY(-65%) rotate(45deg);
+      transition: transform .22s ease;
       pointer-events: none;
     }
     .ios-select.open .ios-select-trigger {
-      border-color: var(--line);
-      box-shadow: 0 0 0 3px rgba(67, 255, 159, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      transform: translateY(-1px);
+      border-color: rgba(61, 255, 160, 0.5);
+      background: #000;
+      box-shadow: 0 0 0 1px rgba(61, 255, 160, 0.18);
     }
     .ios-select.open .ios-select-trigger::after {
-      transform: translateY(-25%) rotate(-135deg);
+      transform: translateY(-30%) rotate(-135deg);
     }
     .ios-select-menu {
       position: absolute;
       left: 0;
       right: 0;
-      top: calc(100% + 8px);
-      background: rgba(14, 20, 18, 0.98);
-      border: 1px solid var(--line-soft);
-      border-radius: 14px;
+      top: calc(100% + 4px);
+      background: #000;
+      border: 1px solid rgba(61, 255, 160, 0.25);
+      border-radius: 0;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       max-height: 220px;
-      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.42);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
       opacity: 0;
-      transform: translateY(-6px) scale(0.98);
+      transform: translateY(-4px) scale(0.99);
       pointer-events: none;
-      transition: opacity .24s ease, transform .24s ease;
+      transition: opacity .2s ease, transform .2s ease;
       z-index: 100;
     }
     .ios-select.open .ios-select-menu {
@@ -245,39 +287,43 @@
     .ios-option {
       width: 100%;
       border: 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(61, 255, 160, 0.06);
       background: transparent;
-      color: #eafff2;
+      color: var(--text);
       text-align: left;
-      padding: 11px 12px;
-      font-weight: 600;
+      padding: 12px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
-      transition: background .18s ease, color .18s ease;
+      transition: background .15s ease;
     }
     .ios-option:last-child { border-bottom: 0; }
     .ios-option:hover {
-      background: rgba(67, 255, 159, 0.18);
-      color: #f4fff8;
+      background: rgba(61, 255, 160, 0.08);
+      color: var(--neon);
     }
 
     .upload-wrap {
       display: none;
-      margin-top: 8px;
-      animation: panelIn .25s ease;
+      margin-top: 10px;
+      animation: panelIn .22s ease;
     }
 
     .upload-btn {
       width: 100%;
-      border: 1px solid var(--line-soft);
-      border-radius: 12px;
-      height: 42px;
-      color: var(--text);
-      font-weight: 700;
-      letter-spacing: .25px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-btn);
+      height: 44px;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       cursor: pointer;
-      background: var(--hud-dark);
-      box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-      transition: all .22s ease;
+      background: rgba(0,0,0,0.2);
+      transition: var(--transition);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -289,40 +335,56 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.24), transparent 80%);
+      background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.06), transparent 70%);
       transform: translateX(-130%);
-      animation: shimmer 2.4s linear infinite;
+      animation: shimmer 3s linear infinite;
       pointer-events: none;
     }
 
     .upload-btn:hover {
-      box-shadow: inset 0 0 20px var(--neon-soft), 0 0 10px rgba(60, 255, 151, 0.22);
-      border-color: var(--line);
+      border-color: var(--line-accent);
+      color: var(--text);
+      background: rgba(61,255,160,0.04);
     }
-    .upload-btn:active {
-      transform: translateY(1px);
-    }
+    .upload-btn:active { transform: scale(0.99); }
+
     .action-wrap {
       display: none;
-      margin-top: 8px;
-      animation: panelIn .25s ease;
+      margin-top: 10px;
+      animation: panelIn .22s ease;
     }
     .action-btn {
       width: 100%;
-      border: 1px solid var(--line-soft);
-      border-radius: 12px;
-      height: 44px;
-      color: var(--text);
-      font-weight: 800;
-      letter-spacing: .35px;
+      border: 1px solid var(--line-accent);
+      border-radius: var(--radius-btn);
+      height: 48px;
+      color: var(--neon);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
       cursor: pointer;
-      background: linear-gradient(90deg, rgba(20, 52, 36, 0.95), rgba(17, 56, 35, 0.95));
-      transition: all .22s ease;
+      background: rgba(61, 255, 160, 0.06);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .action-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 30%, rgba(61,255,160,0.08), transparent 70%);
+      transform: translateX(-130%);
+      animation: shimmer 2.8s linear infinite;
+      pointer-events: none;
     }
     .action-btn:hover {
-      box-shadow: inset 0 0 24px var(--neon-soft), 0 0 10px rgba(60, 255, 151, 0.22);
-      border-color: var(--line);
+      background: rgba(61, 255, 160, 0.10);
+      border-color: rgba(61, 255, 160, 0.4);
+      box-shadow: 0 0 20px rgba(61,255,160,0.08);
     }
+    .action-btn:active { transform: scale(0.99); }
 
     @keyframes shimmer {
       to { transform: translateX(130%); }
@@ -331,311 +393,1136 @@
     input[type="file"] { display: none; }
 
     .status {
-      margin-top: 10px;
-      min-height: 22px;
-      color: #79f3b5;
-      font-family: Consolas, Monaco, monospace;
-      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
+      color: var(--text-secondary);
+      font-family: 'Inter', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .result {
-      margin-top: 12px;
+      margin-top: 14px;
       display: none;
       border: 1px solid var(--line);
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 12px;
+      border-radius: var(--radius-card);
+      background: rgba(0, 0, 0, 0.45);
+      padding: 18px;
     }
     .result.show { display: block; animation: panelIn .25s ease; }
 
     .signal {
-      margin: 0;
-      font-size: 25px;
-      font-weight: 900;
-      letter-spacing: .25px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
     }
-    .signal.up { color: var(--ok); text-shadow: 0 0 16px rgba(53, 227, 134, 0.4); }
-    .signal.down { color: var(--danger); text-shadow: 0 0 16px rgba(255, 97, 127, 0.35); }
+    .signal.up   { color: var(--ok);     text-shadow: 0 0 20px rgba(46, 204, 113, 0.25); }
+    .signal.down { color: var(--danger); text-shadow: 0 0 20px rgba(255, 77, 106, 0.25); }
 
-    .confidence { margin: 8px 0 6px; font-size: 20px; font-weight: 800; }
+    .confidence {
+      margin: 10px 0 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+    }
     .progress {
-      margin: 8px 0 9px;
+      margin: 8px 0 12px;
       width: 100%;
-      height: 8px;
+      height: 3px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(67, 255, 159, 0.25);
+      background: rgba(255,255,255,0.06);
       overflow: hidden;
     }
     .progress > div {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #1d8d57, #42ff9f);
-      box-shadow: 0 0 12px rgba(67, 255, 159, 0.42);
-      transition: width .45s ease;
+      background: linear-gradient(90deg, rgba(61,255,160,0.5), var(--neon));
+      box-shadow: 0 0 8px rgba(61,255,160,0.3);
+      transition: width .45s cubic-bezier(0.4,0,0.2,1);
     }
-    .reasoning { margin: 0; color: #bdd8c8; line-height: 1.45; }
+    .reasoning {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
     .metrics {
-      margin-top: 10px;
-      border-top: 1px solid rgba(255,255,255,.08);
-      padding-top: 10px;
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
       display: grid;
       gap: 6px;
-      font-size: 13px;
-      color: #d5eadf;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
     }
     .signal-card {
-      margin-top: 12px;
-      border: 1px solid var(--line-soft);
-      border-radius: 10px;
-      padding: 12px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-input);
+      padding: 14px;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: rgba(0, 0, 0, .38);
+      background: rgba(0,0,0,0.3);
     }
     .signal-badge {
-      min-width: 150px;
-      height: 42px;
-      border-radius: 0;
+      min-width: 140px;
+      height: 40px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      color: #fff;
-      font-weight: 800;
-      letter-spacing: .4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      border-radius: 6px;
+      border-radius: 8px;
+      color: #fff;
     }
-    .signal-badge.buy {
-      background: #23b34f;
-    }
-    .signal-badge.sell {
-      background: #ff3d35;
-    }
+    .signal-badge.buy  { background: rgba(46, 204, 113, 0.15); border: 1px solid rgba(46,204,113,0.3); color: var(--ok); }
+    .signal-badge.sell { background: rgba(255, 77, 106, 0.12); border: 1px solid rgba(255,77,106,0.3); color: var(--danger); }
     .signal-badge .icon {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
-      background: rgba(0,0,0,.22);
+      font-size: 11px;
+      background: rgba(0,0,0,0.2);
     }
 
     .partner {
-      margin-top: 12px;
+      margin-top: 14px;
       display: none;
       text-align: center;
     }
     .partner a {
       display: inline-block;
       text-decoration: none;
-      color: var(--text);
-      font-weight: 700;
-      border-radius: 12px;
-      padding: 0 16px;
-      line-height: 42px;
-      border: 1px solid var(--line-soft);
-      background: var(--hud-dark);
-      transition: all .22s ease;
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: var(--radius-btn);
+      padding: 0 20px;
+      line-height: 40px;
+      border: 1px solid var(--line);
+      background: transparent;
+      transition: var(--transition);
     }
     .partner a:hover {
-      box-shadow: inset 0 0 20px var(--neon-soft), 0 0 10px rgba(60, 255, 151, 0.22);
-      border-color: var(--line);
+      border-color: var(--line-accent);
+      color: var(--neon);
+      background: rgba(61,255,160,0.04);
     }
 
+    /* Profile */
     .profile-box {
-      border: 1px solid var(--line-soft);
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.34);
-      padding: 12px;
-      margin-bottom: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-card);
+      background: rgba(0,0,0,0.3);
+      padding: 16px;
+      margin-bottom: 14px;
     }
 
     .nick {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 800;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
     }
     .profile-head {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .profile-avatar {
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      border: 1px solid var(--line-soft);
+      border: 1px solid var(--line);
       object-fit: cover;
-      background: rgba(255,255,255,.08);
+      background: rgba(255,255,255,0.05);
       flex-shrink: 0;
     }
     .profile-avatar.fallback {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
-      color: var(--text);
-      background: linear-gradient(180deg, rgba(18, 24, 22, 0.92), rgba(10, 16, 14, 0.92));
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,0.04);
     }
     .meta {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
+      margin: 5px 0 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
     }
 
     .history-title {
-      margin: 10px 0 8px;
-      font-size: 15px;
-      font-weight: 800;
-      color: #c7f7dc;
+      margin: 0 0 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
     }
 
     .history {
       max-height: 320px;
       overflow: auto;
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
 
     .history-item {
-      border: 1px solid var(--line-soft);
-      border-radius: 10px;
-      background: rgba(7, 16, 12, 0.55);
-      padding: 9px 10px;
-      font-size: 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-input);
+      background: rgba(0,0,0,0.25);
+      padding: 10px 12px;
+      font-size: 12px;
+      transition: var(--transition);
+    }
+    .history-item:hover {
+      border-color: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.02);
     }
 
     .history-top {
       display: flex;
       justify-content: space-between;
       gap: 8px;
-      font-weight: 700;
-      margin-bottom: 4px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 5px;
     }
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #dffff0;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
     }
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: #43ff9f;
-      box-shadow: 0 0 10px rgba(67, 255, 159, 0.6);
+      background: var(--ok);
+      box-shadow: 0 0 6px rgba(46, 204, 113, 0.5);
+      flex-shrink: 0;
     }
     .dot.down {
-      background: #ff617f;
-      box-shadow: 0 0 10px rgba(255, 97, 127, 0.5);
+      background: var(--danger);
+      box-shadow: 0 0 6px rgba(255, 77, 106, 0.5);
     }
 
     .empty {
-      color: var(--muted);
-      font-size: 13px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      padding: 8px 0;
     }
+
+    /* ── SPLASH SCREEN ── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: #060808;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      transition: opacity 0.15s ease;
+    }
+    #splash.glitch-out {
+      animation: glitchOut 0.45s forwards;
+    }
+    @keyframes glitchOut {
+      0%   { opacity: 1; transform: none; filter: none; }
+      15%  { opacity: 1; transform: skewX(8deg) translateX(4px); filter: hue-rotate(90deg) brightness(1.4); }
+      30%  { opacity: 0.7; transform: skewX(-6deg) translateX(-6px); filter: hue-rotate(-60deg) brightness(0.8); }
+      50%  { opacity: 0.9; transform: skewX(4deg) translateX(3px) scaleY(1.02); filter: brightness(2); }
+      70%  { opacity: 0.3; transform: skewX(-10deg) translateX(-8px); filter: brightness(0.3); }
+      85%  { opacity: 0.1; transform: scaleY(0.02); filter: brightness(3); }
+      100% { opacity: 0; transform: scaleY(0); pointer-events: none; }
+    }
+    .splash-logo {
+      text-align: center;
+    }
+    .splash-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #e8ede9;
+      margin: 0 0 6px;
+    }
+    .splash-sub {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #3dffa0;
+      opacity: 0.7;
+    }
+    .splash-bar-wrap {
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .splash-bar-track {
+      width: 100%;
+      height: 2px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 0;
+      overflow: hidden;
+    }
+    .splash-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #1a8c52, #3dffa0);
+      box-shadow: 0 0 10px rgba(61,255,160,0.5);
+      border-radius: 0;
+      transition: width 0.12s linear;
+    }
+    .splash-pct {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: #3dffa0;
+      text-align: right;
+    }
+
+    /* ══════════════════════════════
+       MAIN APP LAYOUT — карточка
+    ══════════════════════════════ */
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Карточка приложения — ФИКСИРОВАННЫЙ размер, острые углы, чёрная */
+    .app {
+      width: 380px;
+      height: 640px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100dvh - 32px);
+      max-height: calc(100vh - 32px);
+      background: #000;
+      border: 1px solid rgba(61, 255, 160, 0.35);
+      border-radius: 0;
+      box-shadow:
+        0 0 24px rgba(61, 255, 160, 0.06),
+        0 30px 70px rgba(0,0,0,0.7);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Прямые дочерние элементы — поверх матрицы, но не side-panel (у него свой position) */
+    .app > .head,
+    .app > .menu-grid {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* HEADER */
+    .head {
+      padding: 4px 4px 12px;
+      border-bottom: 1px solid rgba(61, 255, 160, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .head-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .head-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #3dffa0;
+      box-shadow: 0 0 8px rgba(61,255,160,0.7);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(61,255,160,0.7); }
+      50%       { opacity: 0.45; box-shadow: 0 0 4px rgba(61,255,160,0.3); }
+    }
+    .title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #e8ede9;
+    }
+    .subtitle {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #3b4a42;
+    }
+
+    /* MENU GRID — главный экран: только 3 квадрата */
+    .menu-grid {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tile {
+      border: 1px solid rgba(61, 255, 160, 0.35);
+      border-radius: 0;
+      background: #000;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tile:hover {
+      border-color: rgba(61, 255, 160, 0.7);
+      box-shadow: 0 0 20px rgba(61, 255, 160, 0.12), inset 0 0 30px rgba(61, 255, 160, 0.04);
+    }
+    .tile:active { transform: scale(0.99); }
+
+    /* Большая верхняя кнопка "Получить AI сигнал" */
+    .tile-main {
+      flex: 2;
+      min-height: 200px;
+    }
+    .tile-label-main {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #e8ede9;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    /* Нижний ряд: Профиль + История */
+    .tiles-bottom {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .tile-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e8ede9;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    /* SIGNAL BLOCK — теперь внутри overlay */
+    .signal-block {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Market row */
+    .market-row {
+      display: flex;
+      gap: 6px;
+    }
+    .mkt-btn {
+      flex: 1;
+      height: 34px;
+      border: 1px solid rgba(61, 255, 160, 0.18);
+      border-radius: 0;
+      background: transparent;
+      color: #4a5e52;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .mkt-btn:hover { color: #e8ede9; border-color: rgba(61, 255, 160, 0.4); }
+    .mkt-btn.active {
+      border-color: rgba(61, 255, 160, 0.6);
+      color: #3dffa0;
+      background: rgba(61, 255, 160, 0.04);
+    }
+
+    /* Field row */
+    .field-row { display: flex; flex-direction: column; gap: 6px; }
+    label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #3b4a42;
+    }
+
+    /* Action button */
+    .action-wrap { margin-top: 4px; }
+    .action-btn {
+      width: 100%;
+      height: 50px;
+      border: 1px solid rgba(61, 255, 160, 0.5);
+      border-radius: 0;
+      background: rgba(61, 255, 160, 0.04);
+      color: #3dffa0;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 35%, rgba(61,255,160,0.08), transparent 65%);
+      transform: translateX(-100%);
+      animation: shimmer 3s linear infinite;
+    }
+    .action-btn-icon { font-size: 14px; opacity: 0.7; }
+    .action-btn:hover {
+      border-color: rgba(61,255,160,0.85);
+      background: rgba(61,255,160,0.09);
+      box-shadow: 0 0 24px rgba(61,255,160,0.1);
+    }
+    .action-btn:active { transform: scale(0.99); }
+
+    /* Status */
+    .status {
+      min-height: 16px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #3b4a42;
+    }
+
+    /* Result */
+    .result {
+      display: none;
+      border: 1px solid rgba(61, 255, 160, 0.25);
+      border-radius: 0;
+      background: rgba(0,0,0,0.6);
+      padding: 14px;
+      gap: 8px;
+      flex-direction: column;
+    }
+    .result.show { display: flex; animation: panelIn .3s ease; }
+    .result-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .signal {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .signal.up   { color: #2ecc71; }
+    .signal.down { color: #ff4d6a; }
+    .signal-badge-wrap { display: flex; }
+    .signal-badge {
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .signal-badge.buy  { background: rgba(46,204,113,0.1); border: 1px solid rgba(46,204,113,0.4); color: #2ecc71; }
+    .signal-badge.sell { background: rgba(255,77,106,0.1);  border: 1px solid rgba(255,77,106,0.4);  color: #ff4d6a; }
+    .signal-badge .icon { font-size: 11px; }
+    .confidence {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: #4a5e52;
+    }
+    .progress {
+      width: 100%;
+      height: 2px;
+      border-radius: 0;
+      background: rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #1a8c52, #3dffa0);
+      box-shadow: 0 0 6px rgba(61,255,160,0.4);
+      transition: width .5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .reasoning {
+      font-size: 11px;
+      color: #4a5e52;
+      line-height: 1.6;
+    }
+    .metrics {
+      border-top: 1px solid rgba(61, 255, 160, 0.1);
+      padding-top: 8px;
+      display: grid;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      color: #3b4a42;
+      letter-spacing: 0.04em;
+    }
+
+    /* Partner */
+    .partner { text-align: center; display: none; }
+    .partner a {
+      display: inline-block;
+      text-decoration: none;
+      color: #3b4a42;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid rgba(61, 255, 160, 0.18);
+      border-radius: 0;
+      padding: 9px 18px;
+      transition: all 0.2s ease;
+    }
+    .partner a:hover { color: #3dffa0; border-color: rgba(61,255,160,0.5); }
+
+    /* SIDE PANELS — overlay поверх ВСЕГО, не меняя размер карточки */
+    .side-panel {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      animation: panelIn .22s ease;
+    }
+    .side-panel.open { display: flex; }
+    .side-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid rgba(61, 255, 160, 0.18);
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .side-panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e8ede9;
+      text-align: center;
+      flex: 1;
+    }
+    .side-panel-close,
+    .back-btn {
+      border: 1px solid rgba(61, 255, 160, 0.25);
+      background: transparent;
+      color: #3dffa0;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 6px 10px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .side-panel-close { width: 26px; height: 26px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+    .side-panel-close:hover,
+    .back-btn:hover {
+      border-color: rgba(61, 255, 160, 0.6);
+      box-shadow: 0 0 10px rgba(61, 255, 160, 0.15);
+    }
+    .head-spacer { width: 60px; }
+
+    /* Screen content в overlay */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .scroll-list {
+      gap: 8px;
+    }
+
+    /* Большие тайлы (для маркета) */
+    .big-tile {
+      flex: 1;
+      min-height: 100px;
+      border: 1px solid rgba(61, 255, 160, 0.35);
+      border-radius: 0;
+      background: #000;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 16px;
+    }
+    .big-tile:hover {
+      border-color: rgba(61, 255, 160, 0.7);
+      box-shadow: 0 0 20px rgba(61, 255, 160, 0.1);
+    }
+    .big-tile:active { transform: scale(0.99); }
+    .big-tile-label {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: #e8ede9;
+    }
+    .big-tile-sub {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #4a5e52;
+    }
+
+    /* Список инструментов */
+    .pair-row {
+      width: 100%;
+      border: 1px solid rgba(61, 255, 160, 0.18);
+      border-radius: 0;
+      background: #000;
+      color: #e8ede9;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pair-row:hover {
+      border-color: rgba(61, 255, 160, 0.5);
+      background: rgba(61, 255, 160, 0.04);
+    }
+    .pair-row::after {
+      content: "›";
+      color: #3dffa0;
+      font-size: 18px;
+      opacity: 0.5;
+    }
+
+    /* Время — сетка 5 тайлов */
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      flex: 1;
+    }
+    .time-tile {
+      border: 1px solid rgba(61, 255, 160, 0.35);
+      border-radius: 0;
+      background: #000;
+      color: #e8ede9;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      transition: all 0.2s ease;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .time-tile span {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #4a5e52;
+    }
+    .time-tile:hover {
+      border-color: rgba(61, 255, 160, 0.7);
+      box-shadow: 0 0 16px rgba(61, 255, 160, 0.12);
+    }
+    .time-tile:active { transform: scale(0.99); }
+    /* 5-й тайл занимает всю ширину */
+    .time-tile:nth-child(5) {
+      grid-column: 1 / -1;
+    }
+
+    /* Action screen — экран запуска анализа */
+    .action-screen {
+      justify-content: space-between;
+    }
+    .summary-box {
+      border: 1px solid rgba(61, 255, 160, 0.18);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+    }
+    .summary-row span:first-child {
+      color: #4a5e52;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .summary-row span:last-child {
+      color: #e8ede9;
+      font-weight: 700;
+    }
+
+    /* Profile */
+    .profile-box {
+      padding: 18px;
+    }
+    .profile-head { display: flex; align-items: center; gap: 14px; }
+    .profile-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 0;
+      border: 1px solid rgba(61, 255, 160, 0.3);
+      background: #000 center/cover no-repeat;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #3dffa0;
+    }
+    .nick { font-size: 15px; font-weight: 700; color: #e8ede9; }
+    .meta { margin-top: 3px; font-size: 12px; color: #3b4a42; }
+
+    /* History */
+    .history {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .history-item {
+      border: 1px solid rgba(61, 255, 160, 0.15);
+      border-radius: 0;
+      background: rgba(0,0,0,0.5);
+      padding: 11px 13px;
+      transition: border-color 0.15s;
+    }
+    .history-item:hover { border-color: rgba(61, 255, 160, 0.4); }
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: #e8ede9;
+      margin-bottom: 5px;
+    }
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #3b4a42;
+      letter-spacing: 0.04em;
+    }
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 5px rgba(46,204,113,0.5);
+      flex-shrink: 0;
+    }
+    .dot.down { background: #ff4d6a; box-shadow: 0 0 5px rgba(255,77,106,0.5); }
+    .empty { font-size: 11px; color: #3b4a42; padding: 8px 0; }
+
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer { to { transform: translateX(100%); } }
+    input[type="file"] { display: none; }
 
   </style>
 </head>
 <body>
-<canvas id="matrix"></canvas>
-
-<div id="mainScreen" class="screen">
-  <div class="app">
-    <div class="head">
-      <h1 class="title">Matrix Trade Analyzer</h1>
-      <p class="subtitle">AI анализ завершен</p>
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-logo">
+    <p class="splash-title">Vector Oracle AI</p>
+    <p class="splash-sub">Initializing neural engine</p>
+  </div>
+  <div class="splash-bar-wrap">
+    <div class="splash-bar-track">
+      <div class="splash-bar-fill" id="splashFill"></div>
     </div>
-
-    <div class="tabs">
-      <button id="tabAnalyze" class="tab-btn active" type="button">Анализ скриншота</button>
-      <button id="tabProfile" class="tab-btn" type="button">Профиль</button>
-    </div>
-
-    <section id="analyzePanel" class="panel active">
-      <div class="grid-2">
-        <div>
-          <label>Раздел</label>
-          <div class="segment" id="marketSegment">
-            <button type="button" class="segment-btn active" data-market="forex">Валюты</button>
-            <button type="button" class="segment-btn" data-market="crypto">Криптовалюты</button>
-            <button type="button" class="segment-btn" data-market="stocks">Акции</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-1">
-        <div>
-          <label for="pairSelect">Инструмент</label>
-          <div class="ios-select" id="pairSelect">
-            <button class="ios-select-trigger" type="button" data-value="">Выберите</button>
-            <div class="ios-select-menu">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="timeWrap" class="grid-1" style="display:none;">
-        <div>
-          <label for="expirySelect">Время</label>
-          <div class="ios-select" id="expirySelect">
-            <button class="ios-select-trigger" type="button" data-value="">Выберите</button>
-            <div class="ios-select-menu">
-              <button class="ios-option" type="button" data-value="15s">15s</button>
-              <button class="ios-option" type="button" data-value="30s">30s</button>
-              <button class="ios-option" type="button" data-value="1m">1m</button>
-              <button class="ios-option" type="button" data-value="3m">3m</button>
-              <button class="ios-option" type="button" data-value="5m">5m</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="actionWrap" class="action-wrap">
-        <button id="getSignalBtn" class="action-btn" type="button">ПОЛУЧИТЬ AI СИГНАЛ</button>
-      </div>
-
-      <div id="status" class="status"></div>
-
-      <div id="result" class="result">
-        <p id="signal" class="signal">—</p>
-        <p id="confidence" class="confidence"></p>
-        <div class="progress"><div id="confidenceBar"></div></div>
-        <p id="reasoning" class="reasoning"></p>
-        <div id="metrics" class="metrics"></div>
-        <div id="signalCard" class="signal-card" style="display:none;"></div>
-      </div>
-
-      <div id="partner" class="partner">
-        <a id="partnerLink" href="#" target="_blank" rel="noopener noreferrer">Открыть Pocket Option</a>
-      </div>
-    </section>
-
-    <section id="profilePanel" class="panel">
-      <div class="profile-box">
-        <div class="profile-head">
-          <img id="profileAvatar" class="profile-avatar" alt="avatar">
-          <div>
-            <p id="profileName" class="nick">Trader</p>
-            <p id="profileNick" class="meta">@trader</p>
-          </div>
-        </div>
-        <p id="profileMeta" class="meta">История последних сигналов</p>
-      </div>
-      <div class="history-title">История сигналов</div>
-      <div id="history" class="history"></div>
-    </section>
+    <div class="splash-pct" id="splashPct">0%</div>
   </div>
 </div>
 
+<div id="mainScreen" class="screen">
+  <div class="app">
+
+    <!-- Matrix is inside the card, behind content -->
+    <canvas id="matrix"></canvas>
+
+    <!-- HEADER -->
+    <div class="head">
+      <div class="head-left">
+        <span class="head-dot"></span>
+        <h1 class="title">Vector Oracle AI</h1>
+      </div>
+      <p class="subtitle">Neural Signal</p>
+    </div>
+
+    <!-- MAIN MENU — 3 квадрата -->
+    <div class="menu-grid">
+      <button id="openSignal" class="tile tile-main" type="button">
+        <span class="tile-label-main">Получить AI сигнал</span>
+      </button>
+      <div class="tiles-bottom">
+        <button id="tabProfile" class="tile" type="button">
+          <span class="tile-label">Профиль</span>
+        </button>
+        <button id="tabHistory" class="tile" type="button">
+          <span class="tile-label">История<br>сигналов</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SIGNAL FLOW: 5 экранов wizard -->
+
+    <!-- Step 1: выбор маркета -->
+    <div id="screenMarket" class="side-panel">
+      <div class="side-panel-head">
+        <button class="back-btn" data-back="main" type="button">← Назад</button>
+        <span class="side-panel-title">Тип рынка</span>
+        <span class="head-spacer"></span>
+      </div>
+      <div class="screen-content">
+        <button class="big-tile" data-market="forex" type="button">
+          <span class="big-tile-label">FOREX</span>
+          <span class="big-tile-sub">Валютные пары</span>
+        </button>
+        <button class="big-tile" data-market="crypto" type="button">
+          <span class="big-tile-label">CRYPTO</span>
+          <span class="big-tile-sub">Криптовалюты</span>
+        </button>
+        <button class="big-tile" data-market="stocks" type="button">
+          <span class="big-tile-label">STOCKS</span>
+          <span class="big-tile-sub">Акции</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: выбор инструмента -->
+    <div id="screenPair" class="side-panel">
+      <div class="side-panel-head">
+        <button class="back-btn" data-back="market" type="button">← Назад</button>
+        <span class="side-panel-title" id="pairTitle">Инструмент</span>
+        <span class="head-spacer"></span>
+      </div>
+      <div class="screen-content scroll-list" id="pairList"></div>
+    </div>
+
+    <!-- Step 3: выбор времени -->
+    <div id="screenTime" class="side-panel">
+      <div class="side-panel-head">
+        <button class="back-btn" data-back="pair" type="button">← Назад</button>
+        <span class="side-panel-title">Экспирация</span>
+        <span class="head-spacer"></span>
+      </div>
+      <div class="screen-content">
+        <div class="time-grid">
+          <button class="time-tile" data-time="15s" type="button">15<span>сек</span></button>
+          <button class="time-tile" data-time="30s" type="button">30<span>сек</span></button>
+          <button class="time-tile" data-time="1m"  type="button">1<span>мин</span></button>
+          <button class="time-tile" data-time="3m"  type="button">3<span>мин</span></button>
+          <button class="time-tile" data-time="5m"  type="button">5<span>мин</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: подтверждение / запуск анализа -->
+    <div id="screenAction" class="side-panel">
+      <div class="side-panel-head">
+        <button class="back-btn" data-back="time" type="button">← Назад</button>
+        <span class="side-panel-title">Анализ</span>
+        <span class="head-spacer"></span>
+      </div>
+      <div class="screen-content action-screen">
+        <div class="summary-box">
+          <div class="summary-row"><span>Рынок</span><span id="sumMarket">—</span></div>
+          <div class="summary-row"><span>Актив</span><span id="sumPair">—</span></div>
+          <div class="summary-row"><span>Время</span><span id="sumTime">—</span></div>
+        </div>
+        <button id="getSignalBtn" class="action-btn" type="button">
+          <span class="action-btn-icon">◈</span>
+          Получить AI сигнал
+        </button>
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+
+    <!-- Step 5: результат -->
+    <div id="screenResult" class="side-panel">
+      <div class="side-panel-head">
+        <button class="back-btn" data-back="main" type="button">✕ Закрыть</button>
+        <span class="side-panel-title">Результат</span>
+        <span class="head-spacer"></span>
+      </div>
+      <div class="screen-content">
+        <div id="result" class="result show">
+          <div class="result-top">
+            <p id="signal" class="signal">—</p>
+            <div id="signalCard" class="signal-badge-wrap" style="display:none;"></div>
+          </div>
+          <p id="confidence" class="confidence"></p>
+          <div class="progress"><div id="confidenceBar"></div></div>
+          <p id="reasoning" class="reasoning"></p>
+          <div id="metrics" class="metrics"></div>
+        </div>
+        <div id="partner" class="partner">
+          <a id="partnerLink" href="#" target="_blank" rel="noopener noreferrer">
+            Открыть Pocket Option →
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE PANEL — overlay -->
+    <div id="profilePanel" class="side-panel">
+      <div class="side-panel-head">
+        <button class="back-btn" data-back="main" type="button">← Назад</button>
+        <span class="side-panel-title">Профиль</span>
+        <span class="head-spacer"></span>
+      </div>
+      <div class="screen-content">
+        <div class="profile-box">
+          <div class="profile-head">
+            <div id="profileAvatar" class="profile-avatar fallback">T</div>
+            <div>
+              <p id="profileName" class="nick">Trader</p>
+              <p id="profileNick" class="meta">@trader</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY PANEL — overlay -->
+    <div id="historyPanel" class="side-panel">
+      <div class="side-panel-head">
+        <button class="back-btn" data-back="main" type="button">← Назад</button>
+        <span class="side-panel-title">История сигналов</span>
+        <span class="head-spacer"></span>
+      </div>
+      <div id="history" class="history"></div>
+    </div>
+
+  </div>
+
+  <!-- hidden, kept for JS compatibility -->
+  <button id="tabAnalyze" type="button" style="display:none;"></button>
+</div>
+
 <script>
+  // ── SPLASH SCREEN ──
+  (function() {
+    const splash   = document.getElementById('splash');
+    const fill     = document.getElementById('splashFill');
+    const pctEl    = document.getElementById('splashPct');
+    let pct = 0;
+
+    const interval = setInterval(() => {
+      // accelerate near end
+      const step = pct < 80 ? (3 + Math.random() * 5) : (0.8 + Math.random() * 1.5);
+      pct = Math.min(100, pct + step);
+      fill.style.width = pct + '%';
+      pctEl.textContent = Math.floor(pct) + '%';
+
+      if (pct >= 100) {
+        clearInterval(interval);
+        // hold 1.2s at 100%, then glitch out
+        setTimeout(() => {
+          splash.classList.add('glitch-out');
+          setTimeout(() => {
+            splash.style.display = 'none';
+          }, 500);
+        }, 1200);
+      }
+    }, 60);
+  })();
+
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.expand();
@@ -663,137 +1550,121 @@
   const MARKET_DATA = { forex: FOREX_PAIRS, crypto: CRYPTO, stocks: STOCKS };
   let activeMarket = "forex";
 
-  const tabAnalyze = document.getElementById("tabAnalyze");
-  const tabProfile = document.getElementById("tabProfile");
-  const analyzePanel = document.getElementById("analyzePanel");
+  // Nav elements
+  const tabAnalyze  = document.getElementById("tabAnalyze");
+  const tabProfile  = document.getElementById("tabProfile");
+  const tabHistory  = document.getElementById("tabHistory");
+  const openSignal  = document.getElementById("openSignal");
+
+  // Wizard screens
+  const screenMarket = document.getElementById("screenMarket");
+  const screenPair   = document.getElementById("screenPair");
+  const screenTime   = document.getElementById("screenTime");
+  const screenAction = document.getElementById("screenAction");
+  const screenResult = document.getElementById("screenResult");
   const profilePanel = document.getElementById("profilePanel");
-  const marketSegment = document.getElementById("marketSegment");
-  const timeWrap = document.getElementById("timeWrap");
+  const historyPanel = document.getElementById("historyPanel");
 
-  const pairSelect = document.getElementById("pairSelect");
-  const expirySelect = document.getElementById("expirySelect");
-  const actionWrap = document.getElementById("actionWrap");
+  const pairList   = document.getElementById("pairList");
+  const pairTitle  = document.getElementById("pairTitle");
+  const sumMarket  = document.getElementById("sumMarket");
+  const sumPair    = document.getElementById("sumPair");
+  const sumTime    = document.getElementById("sumTime");
+
   const getSignalBtn = document.getElementById("getSignalBtn");
-
-  const statusEl = document.getElementById("status");
-  const resultEl = document.getElementById("result");
-  const signalEl = document.getElementById("signal");
-  const confidenceEl = document.getElementById("confidence");
-  const reasoningEl = document.getElementById("reasoning");
+  const statusEl      = document.getElementById("status");
+  const resultEl      = document.getElementById("result");
+  const signalEl      = document.getElementById("signal");
+  const confidenceEl  = document.getElementById("confidence");
+  const reasoningEl   = document.getElementById("reasoning");
   const confidenceBar = document.getElementById("confidenceBar");
-  const metricsEl = document.getElementById("metrics");
-  const signalCardEl = document.getElementById("signalCard");
+  const metricsEl     = document.getElementById("metrics");
+  const signalCardEl  = document.getElementById("signalCard");
   const partnerWrapEl = document.getElementById("partner");
   const partnerLinkEl = document.getElementById("partnerLink");
 
   const profileAvatar = document.getElementById("profileAvatar");
-  const profileName = document.getElementById("profileName");
-  const profileNick = document.getElementById("profileNick");
-  const historyEl = document.getElementById("history");
+  const profileName   = document.getElementById("profileName");
+  const profileNick   = document.getElementById("profileNick");
+  const historyEl     = document.getElementById("history");
+
+  // Set profile info
   profileName.textContent = fullName;
   profileNick.textContent = username;
   if (profileImage) {
-    profileAvatar.src = profileImage;
+    profileAvatar.style.backgroundImage = `url(${profileImage})`;
+    profileAvatar.textContent = "";
   } else {
-    profileAvatar.removeAttribute("src");
-    profileAvatar.classList.add("fallback");
     profileAvatar.textContent = (fullName || "T").slice(0, 1).toUpperCase();
   }
 
-  function switchTab(isProfile) {
-    tabAnalyze.classList.toggle("active", !isProfile);
-    tabProfile.classList.toggle("active", isProfile);
-    analyzePanel.classList.toggle("active", !isProfile);
-    profilePanel.classList.toggle("active", isProfile);
-    if (isProfile) loadHistory();
+  // ── WIZARD STATE ──
+  let selectedMarket = null;
+  let selectedPair   = null;
+  let selectedTime   = null;
+  const MARKET_LABELS = { forex: "FOREX", crypto: "CRYPTO", stocks: "STOCKS" };
+
+  function closeAllPanels() {
+    [screenMarket, screenPair, screenTime, screenAction, screenResult, profilePanel, historyPanel]
+      .forEach(p => p.classList.remove("open"));
+  }
+  function openPanel(panel) {
+    closeAllPanels();
+    panel.classList.add("open");
   }
 
-  tabAnalyze.addEventListener("click", () => switchTab(false));
-  tabProfile.addEventListener("click", () => switchTab(true));
+  // Main menu tiles
+  openSignal.addEventListener("click", () => openPanel(screenMarket));
+  tabProfile.addEventListener("click", () => openPanel(profilePanel));
+  tabHistory.addEventListener("click", () => { openPanel(historyPanel); loadHistory(); });
 
-  function selectedValue(selectEl) {
-    return selectEl.querySelector(".ios-select-trigger").dataset.value || "";
-  }
-
-  function closeAllSelects() {
-    document.querySelectorAll(".ios-select.open").forEach((el) => el.classList.remove("open"));
-  }
-
-  function setSelectValue(selectEl, value, label) {
-    const trigger = selectEl.querySelector(".ios-select-trigger");
-    trigger.dataset.value = value || "";
-    trigger.textContent = label || "Выберите";
-  }
-
-  function populateInstrumentOptions() {
-    const menu = pairSelect.querySelector(".ios-select-menu");
-    menu.innerHTML = "";
-    MARKET_DATA[activeMarket].forEach((item) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "ios-option";
-      btn.dataset.value = item;
-      btn.textContent = item;
-      menu.appendChild(btn);
-    });
-    // Re-bind only option clicks (trigger listener is set once at init)
-    bindOptionClicks(pairSelect);
-  }
-
-  function bindOptionClicks(selectEl) {
-    selectEl.querySelectorAll(".ios-option").forEach((opt) => {
-      opt.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const trigger = selectEl.querySelector(".ios-select-trigger");
-        trigger.dataset.value = opt.dataset.value;
-        trigger.textContent = opt.dataset.value;
-        selectEl.classList.remove("open");
-        if (selectEl === pairSelect) {
-          timeWrap.style.display = "grid";
-          setSelectValue(expirySelect, "", "Выберите");
-        }
-        updateUploadVisibility();
-      });
-    });
-  }
-
-  function setupCustomSelect(selectEl) {
-    const trigger = selectEl.querySelector(".ios-select-trigger");
-    trigger.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const willOpen = !selectEl.classList.contains("open");
-      closeAllSelects();
-      if (willOpen) selectEl.classList.add("open");
-    });
-    bindOptionClicks(selectEl);
-  }
-
-  function updateUploadVisibility() {
-    const ready = selectedValue(pairSelect) && selectedValue(expirySelect);
-    actionWrap.style.display = ready ? "block" : "none";
-  }
-
-  marketSegment.querySelectorAll(".segment-btn").forEach((btn) => {
+  // Step 1 → market selected
+  screenMarket.querySelectorAll(".big-tile").forEach(btn => {
     btn.addEventListener("click", () => {
-      marketSegment.querySelectorAll(".segment-btn").forEach((x) => x.classList.remove("active"));
-      btn.classList.add("active");
-      activeMarket = btn.dataset.market;
-      setSelectValue(pairSelect, "", "Выберите");
-      setSelectValue(expirySelect, "", "Выберите");
-      timeWrap.style.display = "none";
-      actionWrap.style.display = "none";
-      populateInstrumentOptions();
-      resultEl.classList.remove("show");
-      signalCardEl.style.display = "none";
-      closeAllSelects();
+      selectedMarket = btn.dataset.market;
+      pairTitle.textContent = MARKET_LABELS[selectedMarket];
+      buildPairList(selectedMarket);
+      openPanel(screenPair);
     });
   });
 
-  setupCustomSelect(pairSelect);
-  setupCustomSelect(expirySelect);
-  populateInstrumentOptions();
-  document.addEventListener("click", () => closeAllSelects());
-  updateUploadVisibility();
+  // Step 2 → pair list builder
+  function buildPairList(market) {
+    pairList.innerHTML = "";
+    MARKET_DATA[market].forEach(item => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pair-row";
+      btn.textContent = item;
+      btn.addEventListener("click", () => {
+        selectedPair = item;
+        openPanel(screenTime);
+      });
+      pairList.appendChild(btn);
+    });
+  }
+
+  // Step 3 → time selected
+  screenTime.querySelectorAll(".time-tile").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedTime = btn.dataset.time;
+      sumMarket.textContent = MARKET_LABELS[selectedMarket];
+      sumPair.textContent   = selectedPair;
+      sumTime.textContent   = selectedTime;
+      openPanel(screenAction);
+    });
+  });
+
+  // Back buttons
+  document.querySelectorAll(".back-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.back;
+      if (target === "main")    { closeAllPanels(); return; }
+      if (target === "market")  { openPanel(screenMarket); return; }
+      if (target === "pair")    { openPanel(screenPair); return; }
+      if (target === "time")    { openPanel(screenTime); return; }
+    });
+  });
 
   function renderHistory(items) {
     if (!items || items.length === 0) {
@@ -822,11 +1693,13 @@
   }
 
   getSignalBtn.addEventListener("click", () => {
-    const pair = selectedValue(pairSelect);
-    const expiry = selectedValue(expirySelect);
+    const pair = selectedPair;
+    const expiry = selectedTime;
     if (!pair || !expiry) return;
 
-    statusEl.textContent = "AI АНАЛИЗИРУЕТ";
+    // Lock UI during analysis
+    getSignalBtn.disabled = true;
+    statusEl.textContent = "AI АНАЛИЗИРУЕТ 0%";
     resultEl.classList.remove("show");
     partnerWrapEl.style.display = "none";
     signalCardEl.style.display = "none";
@@ -846,19 +1719,23 @@
     const ticker = setInterval(() => {
       const step = Math.floor(5 + Math.random() * 14);
       progress = Math.min(100, progress + step);
-      confidenceBar.style.width = `${progress}%`;
       statusEl.textContent = `AI АНАЛИЗИРУЕТ ${progress}%`;
       if (progress < 100) return;
       clearInterval(ticker);
 
+      // Switch to result screen
+      openPanel(screenResult);
+      getSignalBtn.disabled = false;
+
       signalEl.textContent = signalText;
       signalEl.className = `signal ${signalClass}`;
+      confidenceBar.style.width = `${finalAccuracy}%`;
       confidenceEl.textContent = `Точность сигнала: ${finalAccuracy}%`;
-      reasoningEl.textContent = "AI анализ завершен";
+      reasoningEl.textContent = "Нейросеть завершила анализ рыночной структуры";
       metricsEl.innerHTML = `
-        <div>Сила актива: ${power}%</div>
-        <div>Анализ объема: ${volume}%</div>
-        <div>Точность сигнала: ${precision}%</div>
+        <div>Сила актива — ${power}%</div>
+        <div>Объём рынка — ${volume}%</div>
+        <div>Точность модели — ${precision}%</div>
       `;
       signalCardEl.style.display = "flex";
       signalCardEl.innerHTML = `
@@ -870,7 +1747,7 @@
 
       resultEl.classList.add("show");
       partnerWrapEl.style.display = "block";
-      statusEl.textContent = "AI анализ завершен";
+      statusEl.textContent = "";
       partnerLinkEl.href = "https://pocketoption.com";
 
       const existing = JSON.parse(localStorage.getItem(historyStorageKey) || "[]");
@@ -895,14 +1772,15 @@
   const fontSize = 14;
 
   function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = Math.max(1, Math.floor(rect.width));
+    canvas.height = Math.max(1, Math.floor(rect.height));
     const count = Math.floor(canvas.width / fontSize);
     columns = new Array(count).fill(0).map(() => Math.random() * canvas.height / fontSize);
   }
 
   function draw() {
-    ctx.fillStyle = "rgba(4, 9, 10, 0.09)";
+    ctx.fillStyle = "rgba(6, 8, 8, 0.10)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.font = `${fontSize}px monospace`;
 
