@@ -6,8 +6,9 @@
   <title>Matrix Trade Analyzer</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="./config.js"></script>
+  <link rel="stylesheet" href="./styles.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Press+Start+2P&display=swap');
 
     :root {
       /* Stealth Wealth — Obsidian Black palette */
@@ -36,14 +37,15 @@
       overflow: hidden;
       background: #000;
       color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Press Start 2P', monospace;
       font-size: 14px;
+      font-weight: 700;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
       text-rendering: geometricPrecision;
     }
 
-    /* Matrix — внутри карточки, под контентом */
+    /* Matrix � ������ ���� �����, ��� ������� */
     #matrix {
       position: absolute;
       inset: 0;
@@ -51,8 +53,12 @@
       width: 100%;
       height: 100%;
       opacity: 0.45;
-      filter: blur(0.5px);
       pointer-events: none;
+    }
+    .app > .head,
+    .app > .menu-grid {
+      position: relative;
+      z-index: 1;
     }
 
     .screen {
@@ -775,11 +781,12 @@
       50%       { opacity: 0.45; box-shadow: 0 0 4px rgba(61,255,160,0.3); }
     }
     .title {
-      font-size: 12px;
+      font-size: 7px;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #e8ede9;
+      white-space: nowrap;
     }
     .subtitle {
       font-size: 9px;
@@ -799,9 +806,10 @@
     .tile {
       border: 1px solid rgba(61, 255, 160, 0.35);
       border-radius: 0;
-      background: #000;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
+      background: rgba(0, 0, 0, 0.9);
+      position: relative;
+      z-index: 3;
+      cursor: pointer;      font-family: 'Inter', sans-serif;
       transition: all 0.2s ease;
       position: relative;
       overflow: hidden;
@@ -821,7 +829,7 @@
       min-height: 200px;
     }
     .tile-label-main {
-      font-size: 18px;
+      font-size: 10px;
       font-weight: 700;
       letter-spacing: 0.06em;
       color: #e8ede9;
@@ -837,13 +845,13 @@
       gap: 12px;
     }
     .tile-label {
-      font-size: 13px;
+      font-size: 9px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
       color: #e8ede9;
       text-align: center;
-      line-height: 1.3;
+      line-height: 1.6;
     }
 
     /* SIGNAL BLOCK — теперь внутри overlay */
@@ -948,7 +956,7 @@
       display: none;
       border: 1px solid rgba(61, 255, 160, 0.25);
       border-radius: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.9);
       padding: 14px;
       gap: 8px;
       flex-direction: column;
@@ -1038,39 +1046,72 @@
     }
     .partner a:hover { color: #3dffa0; border-color: rgba(61,255,160,0.5); }
 
-    /* SIDE PANELS — overlay поверх ВСЕГО, не меняя размер карточки */
+    /* SIDE PANELS — поверх матрицы, без своего фона */
     .side-panel {
       position: absolute;
       inset: 0;
-      z-index: 20;
+      z-index: 103;
       background: #000;
       display: none;
       flex-direction: column;
-      animation: panelIn .22s ease;
     }
-    .side-panel.open { display: flex; }
+    /* Заголовок и контент — полупрозрачный тёмный фон */
+    /* Panel matrix canvas — same as main canvas but inside each overlay */
+    .panel-matrix {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    /* All overlay content above panel-matrix */
+    .side-panel > *:not(.panel-matrix) {
+      position: relative;
+      z-index: 1;
+    }
+    .side-panel.open {
+      display: flex;
+    }
+    /* Анимация вперёд — слайд справа */
+    .side-panel.anim-forward {
+      animation: slideInRight 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    /* Анимация назад — слайд слева */
+    .side-panel.anim-back {
+      animation: slideInLeft 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
     .side-panel-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 18px 18px 14px;
+      padding: 14px 18px;
       border-bottom: 1px solid rgba(61, 255, 160, 0.18);
       flex-shrink: 0;
       gap: 8px;
     }
     .side-panel-title {
-      font-size: 12px;
+      display: block;
+      font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: #e8ede9;
-      text-align: center;
-      flex: 1;
+      padding: 14px 18px 10px;
+      flex-shrink: 0;
     }
     .side-panel-close,
     .back-btn {
       border: 1px solid rgba(61, 255, 160, 0.25);
-      background: transparent;
+      background: rgba(0,0,0,0.9);
       color: #3dffa0;
       font-family: 'Inter', sans-serif;
       font-size: 10px;
@@ -1104,139 +1145,178 @@
       gap: 8px;
     }
 
-    /* Большие тайлы (для маркета) */
-    .big-tile {
-      flex: 1;
-      min-height: 100px;
-      border: 1px solid rgba(61, 255, 160, 0.35);
-      border-radius: 0;
-      background: #000;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s ease;
+    /* Сетка 5 категорий: 3 сверху + 2 снизу */
+    .cat-grid {
       display: flex;
       flex-direction: column;
+      gap: 12px;
+    }
+    .cat-row {
+      display: grid;
+      gap: 12px;
+    }
+    .cat-row-top    { grid-template-columns: 1fr 1fr 1fr; }
+    .cat-row-bottom { grid-template-columns: 1fr 1fr; }
+    .cat-tile {
+      border: 1px solid rgba(61, 255, 160, 0.35);
+      border-radius: 0;
+      background: rgba(0, 0, 0, 0.9);
+      color: #e8ede9;
+      font-family: 'Inter', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      height: 100px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      padding: 16px;
+      text-align: center;
+      padding: 12px 8px;
+      transition: all 0.2s ease;
+      line-height: 1.3;
+      position: relative;
+      z-index: 3;
     }
-    .big-tile:hover {
+    .cat-tile:hover {
       border-color: rgba(61, 255, 160, 0.7);
       box-shadow: 0 0 20px rgba(61, 255, 160, 0.1);
     }
-    .big-tile:active { transform: scale(0.99); }
-    .big-tile-label {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
-      color: #e8ede9;
-    }
-    .big-tile-sub {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #4a5e52;
-    }
+    .cat-tile:active { transform: scale(0.98); }
 
-    /* Список инструментов */
-    .pair-row {
+    /* ── АККОРДЕОН ── */
+    .accordion-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+    .accordion-btn {
       width: 100%;
-      border: 1px solid rgba(61, 255, 160, 0.18);
+      border: 1px solid rgba(61, 255, 160, 0.35);
       border-radius: 0;
-      background: #000;
+      background: rgba(0, 0, 0, 0.9);
+      position: relative;
+      z-index: 3;
+      color: #e8ede9;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      height: 52px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+    .accordion-btn:hover {
+      border-color: rgba(61, 255, 160, 0.6);
+      background: rgba(61, 255, 160, 0.03);
+    }
+    .accordion-arrow {
+      font-size: 10px;
+      color: #3dffa0;
+      transition: transform 0.25s ease;
+    }
+    .accordion-arrow.open { transform: rotate(180deg); }
+
+    .accordion-list {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      border-left: 1px solid rgba(61, 255, 160, 0.18);
+      border-right: 1px solid rgba(61, 255, 160, 0.18);
+    }
+    .accordion-list.open {
+      max-height: 260px;
+      overflow-y: auto;
+      border-bottom: 1px solid rgba(61, 255, 160, 0.18);
+    }
+    .list-item {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid rgba(61, 255, 160, 0.08);
+      background: rgba(0, 0, 0, 0.9);
+      position: relative;
+      z-index: 3;
       color: #e8ede9;
       font-family: 'Inter', sans-serif;
       font-size: 13px;
       font-weight: 500;
       text-align: left;
-      padding: 14px 16px;
+      padding: 13px 16px;
       cursor: pointer;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      transition: background 0.15s ease;
+      display: block;
     }
-    .pair-row:hover {
-      border-color: rgba(61, 255, 160, 0.5);
-      background: rgba(61, 255, 160, 0.04);
-    }
-    .pair-row::after {
-      content: "›";
+    .list-item:last-child { border-bottom: 0; }
+    .list-item:hover {
+      background: rgba(61, 255, 160, 0.07);
       color: #3dffa0;
-      font-size: 18px;
-      opacity: 0.5;
     }
 
-    /* Время — сетка 5 тайлов */
-    .time-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      flex: 1;
-    }
-    .time-tile {
-      border: 1px solid rgba(61, 255, 160, 0.35);
-      border-radius: 0;
-      background: #000;
-      color: #e8ede9;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      transition: all 0.2s ease;
-      min-height: 90px;
+    /* Зафиксированный выбор */
+    .selected-row {
+      border: 1px solid rgba(61, 255, 160, 0.25);
+      padding: 12px 16px;
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      gap: 2px;
+      background: rgba(0, 0, 0, 0.9);
+      position: relative;
+      z-index: 3;
     }
-    .time-tile span {
+    .selected-label {
       font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.16em;
+      font-weight: 600;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #4a5e52;
+      color: #3b4a42;
     }
-    .time-tile:hover {
-      border-color: rgba(61, 255, 160, 0.7);
-      box-shadow: 0 0 16px rgba(61, 255, 160, 0.12);
-    }
-    .time-tile:active { transform: scale(0.99); }
-    /* 5-й тайл занимает всю ширину */
-    .time-tile:nth-child(5) {
-      grid-column: 1 / -1;
+    .selected-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #3dffa0;
+      letter-spacing: 0.04em;
     }
 
-    /* Action screen — экран запуска анализа */
-    .action-screen {
-      justify-content: space-between;
-    }
-    .summary-box {
-      border: 1px solid rgba(61, 255, 160, 0.18);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
+    /* Пульсирующая кнопка "Получить сигнал" */
+    .pulse-btn {
+      width: 100%;
+      height: 60px;
+      border: 1px solid rgba(61, 255, 160, 0.6);
+      border-radius: 0;
+      background: rgba(0, 0, 0, 0.9);
+      position: relative;
+      z-index: 3;
+      color: #3dffa0;
       font-family: 'Inter', sans-serif;
-      font-size: 12px;
-    }
-    .summary-row span:first-child {
-      color: #4a5e52;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-    .summary-row span:last-child {
-      color: #e8ede9;
+      font-size: 14px;
       font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      animation: pulseBorder 2s ease-in-out infinite;
+      transition: all 0.2s ease;
+    }
+    .pulse-btn:hover {
+      background: rgba(61, 255, 160, 0.12);
+      box-shadow: 0 0 30px rgba(61, 255, 160, 0.15);
+    }
+    .pulse-btn:active { transform: scale(0.99); }
+    @keyframes pulseBorder {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(61, 255, 160, 0);
+        border-color: rgba(61, 255, 160, 0.6);
+      }
+      50% {
+        box-shadow: 0 0 0 6px rgba(61, 255, 160, 0.08);
+        border-color: rgba(61, 255, 160, 1);
+      }
     }
 
     /* Profile */
@@ -1249,7 +1329,7 @@
       height: 48px;
       border-radius: 0;
       border: 1px solid rgba(61, 255, 160, 0.3);
-      background: #000 center/cover no-repeat;
+      background: rgba(0,0,0,0.9) center/cover no-repeat;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -1273,7 +1353,7 @@
     .history-item {
       border: 1px solid rgba(61, 255, 160, 0.15);
       border-radius: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.9);
       padding: 11px 13px;
       transition: border-color 0.15s;
     }
@@ -1311,7 +1391,6 @@
     }
     @keyframes shimmer { to { transform: translateX(100%); } }
     input[type="file"] { display: none; }
-
   </style>
 </head>
 <body>
@@ -1329,19 +1408,18 @@
   </div>
 </div>
 
+<!-- Matrix: fixed на весь экран, видна на всех страницах -->
+
 <div id="mainScreen" class="screen">
   <div class="app">
 
-    <!-- Matrix is inside the card, behind content -->
     <canvas id="matrix"></canvas>
 
-    <!-- HEADER -->
-    <div class="head">
+    <!-- HEADER -->    <div class="head">
       <div class="head-left">
         <span class="head-dot"></span>
         <h1 class="title">Vector Oracle AI</h1>
       </div>
-      <p class="subtitle">Neural Signal</p>
     </div>
 
     <!-- MAIN MENU — 3 квадрата -->
@@ -1361,85 +1439,102 @@
 
     <!-- SIGNAL FLOW: 5 экранов wizard -->
 
-    <!-- Step 1: выбор маркета -->
+    <!-- Step 1: выбор категории инструмента — 5 квадратов -->
     <div id="screenMarket" class="side-panel">
+      <canvas class="panel-matrix"></canvas>
       <div class="side-panel-head">
         <button class="back-btn" data-back="main" type="button">← Назад</button>
-        <span class="side-panel-title">Тип рынка</span>
         <span class="head-spacer"></span>
       </div>
+      <span class="side-panel-title">Выберите инструмент</span>
       <div class="screen-content">
-        <button class="big-tile" data-market="forex" type="button">
-          <span class="big-tile-label">FOREX</span>
-          <span class="big-tile-sub">Валютные пары</span>
-        </button>
-        <button class="big-tile" data-market="crypto" type="button">
-          <span class="big-tile-label">CRYPTO</span>
-          <span class="big-tile-sub">Криптовалюты</span>
-        </button>
-        <button class="big-tile" data-market="stocks" type="button">
-          <span class="big-tile-label">STOCKS</span>
-          <span class="big-tile-sub">Акции</span>
-        </button>
+        <div class="cat-grid">
+          <div class="cat-row cat-row-top">
+            <button class="cat-tile" data-market="forex"       type="button">Валюты</button>
+            <button class="cat-tile" data-market="indexes"     type="button">Индексы</button>
+            <button class="cat-tile" data-market="stocks"      type="button">Акции</button>
+          </div>
+          <div class="cat-row cat-row-bottom">
+            <button class="cat-tile" data-market="crypto"      type="button">Крипто&shy;валюты</button>
+            <button class="cat-tile" data-market="commodities" type="button">Сырьевые товары</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Step 2: выбор инструмента -->
+    <!-- Step 2: выбор инструмента — аккордеон -->
     <div id="screenPair" class="side-panel">
+      <canvas class="panel-matrix"></canvas>
       <div class="side-panel-head">
         <button class="back-btn" data-back="market" type="button">← Назад</button>
-        <span class="side-panel-title" id="pairTitle">Инструмент</span>
         <span class="head-spacer"></span>
       </div>
-      <div class="screen-content scroll-list" id="pairList"></div>
-    </div>
-
-    <!-- Step 3: выбор времени -->
-    <div id="screenTime" class="side-panel">
-      <div class="side-panel-head">
-        <button class="back-btn" data-back="pair" type="button">← Назад</button>
-        <span class="side-panel-title">Экспирация</span>
-        <span class="head-spacer"></span>
-      </div>
+      <span class="side-panel-title" id="pairTitle">Инструмент</span>
       <div class="screen-content">
-        <div class="time-grid">
-          <button class="time-tile" data-time="15s" type="button">15<span>сек</span></button>
-          <button class="time-tile" data-time="30s" type="button">30<span>сек</span></button>
-          <button class="time-tile" data-time="1m"  type="button">1<span>мин</span></button>
-          <button class="time-tile" data-time="3m"  type="button">3<span>мин</span></button>
-          <button class="time-tile" data-time="5m"  type="button">5<span>мин</span></button>
+
+        <!-- Выбранный актив (скрыт пока не выбран) -->
+        <div id="selectedAssetRow" class="selected-row" style="display:none;">
+          <span class="selected-label">Актив</span>
+          <span id="selectedAssetVal" class="selected-val">—</span>
         </div>
+
+        <!-- Кнопка выбрать актив + аккордеон -->
+        <div id="assetAccordion" class="accordion-wrap">
+          <button id="toggleAssetList" class="accordion-btn" type="button">
+            Выбрать актив
+            <span class="accordion-arrow" id="assetArrow">▼</span>
+          </button>
+          <div id="assetList" class="accordion-list"></div>
+        </div>
+
+        <!-- Выбор времени (скрыт пока не выбран актив) -->
+        <div id="timeSection" style="display:none;">
+          <div id="selectedTimeRow" class="selected-row" style="display:none;">
+            <span class="selected-label">Время</span>
+            <span id="selectedTimeVal" class="selected-val">—</span>
+          </div>
+          <div class="accordion-wrap">
+            <button id="toggleTimeList" class="accordion-btn" type="button">
+              Выбрать время сделки
+              <span class="accordion-arrow" id="timeArrow">▼</span>
+            </button>
+            <div id="timeList" class="accordion-list">
+              <button class="list-item" data-time="S3"  type="button">S3</button>
+              <button class="list-item" data-time="S15" type="button">S15</button>
+              <button class="list-item" data-time="S30" type="button">S30</button>
+              <button class="list-item" data-time="M1"  type="button">M1</button>
+              <button class="list-item" data-time="M3"  type="button">M3</button>
+              <button class="list-item" data-time="M5"  type="button">M5</button>
+              <button class="list-item" data-time="M30" type="button">M30</button>
+              <button class="list-item" data-time="H1"  type="button">H1</button>
+              <button class="list-item" data-time="H4"  type="button">H4</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Кнопка получить сигнал (скрыта пока не выбрано время) -->
+        <div id="getSignalWrap" style="display:none;">
+          <button id="getSignalBtn" class="pulse-btn" type="button">
+            Получить сигнал
+          </button>
+        </div>
+
+        <div id="status" class="status"></div>
+
       </div>
     </div>
 
-    <!-- Step 4: подтверждение / запуск анализа -->
-    <div id="screenAction" class="side-panel">
-      <div class="side-panel-head">
-        <button class="back-btn" data-back="time" type="button">← Назад</button>
-        <span class="side-panel-title">Анализ</span>
-        <span class="head-spacer"></span>
-      </div>
-      <div class="screen-content action-screen">
-        <div class="summary-box">
-          <div class="summary-row"><span>Рынок</span><span id="sumMarket">—</span></div>
-          <div class="summary-row"><span>Актив</span><span id="sumPair">—</span></div>
-          <div class="summary-row"><span>Время</span><span id="sumTime">—</span></div>
-        </div>
-        <button id="getSignalBtn" class="action-btn" type="button">
-          <span class="action-btn-icon">◈</span>
-          Получить AI сигнал
-        </button>
-        <div id="status" class="status"></div>
-      </div>
-    </div>
+    <!-- Step 3: выбор времени — УБРАН, теперь внутри screenPair -->
+    <!-- Step 4: подтверждение — УБРАН, теперь внутри screenPair -->
 
     <!-- Step 5: результат -->
     <div id="screenResult" class="side-panel">
+      <canvas class="panel-matrix"></canvas>
       <div class="side-panel-head">
         <button class="back-btn" data-back="main" type="button">✕ Закрыть</button>
-        <span class="side-panel-title">Результат</span>
         <span class="head-spacer"></span>
       </div>
+      <span class="side-panel-title">Результат</span>
       <div class="screen-content">
         <div id="result" class="result show">
           <div class="result-top">
@@ -1461,11 +1556,12 @@
 
     <!-- PROFILE PANEL — overlay -->
     <div id="profilePanel" class="side-panel">
+      <canvas class="panel-matrix"></canvas>
       <div class="side-panel-head">
         <button class="back-btn" data-back="main" type="button">← Назад</button>
-        <span class="side-panel-title">Профиль</span>
         <span class="head-spacer"></span>
       </div>
+      <span class="side-panel-title">Профиль</span>
       <div class="screen-content">
         <div class="profile-box">
           <div class="profile-head">
@@ -1481,11 +1577,12 @@
 
     <!-- HISTORY PANEL — overlay -->
     <div id="historyPanel" class="side-panel">
+      <canvas class="panel-matrix"></canvas>
       <div class="side-panel-head">
         <button class="back-btn" data-back="main" type="button">← Назад</button>
-        <span class="side-panel-title">История сигналов</span>
         <span class="head-spacer"></span>
       </div>
+      <span class="side-panel-title">История сигналов</span>
       <div id="history" class="history"></div>
     </div>
 
@@ -1547,7 +1644,22 @@
   const STOCKS = [
     "American Express OTC","Intel OTC","Johnson & Johnson OTC","Tesla OTC","Advanced Micro Devices OTC","Citigroup Inc OTC","Coinbase Global OTC","VIX OTC","McDonald's OTC","Alibaba OTC","ExxonMobil OTC","Apple OTC","Netflix OTC","Amazon OTC","Boeing Company OTC","Palantir Technologies OTC","GameStop Corp OTC","Marathon Digital Holdings OTC","FedEx OTC","VISA OTC","FACEBOOK INC OTC","Cisco OTC","Pfizer Inc OTC","Microsoft OTC"
   ];
-  const MARKET_DATA = { forex: FOREX_PAIRS, crypto: CRYPTO, stocks: STOCKS };
+  const INDEXES = [
+    "AUS 200 OTC","100GBP OTC","D30EUR OTC","DJI30 OTC","E35EUR OTC",
+    "E50EUR OTC","F40EUR OTC","JPN225 OTC","US100","US100 OTC",
+    "SP500","SP500 OTC","100GBP","AEX 25","CAC 40",
+    "D30/EUR","DJI30","E35EUR","E50/EUR","F40/EUR",
+    "HONG KONG 33","JPN225","SMI 20","AUS 200"
+  ];
+  const COMMODITIES = [
+    "Brent Oil OTC","WTI Crude Oil OTC","Silver OTC","Gold OTC","Natural Gas OTC",
+    "Palladium spot OTC","Platinum spot OTC","Brent Oil","WTI Crude Oil",
+    "XAG/EUR Silver","XAU/EUR Gold","Natural Gas","Palladium spot","Platinum spot"
+  ];
+  const MARKET_DATA = {
+    forex: FOREX_PAIRS, crypto: CRYPTO, stocks: STOCKS,
+    indexes: INDEXES, commodities: COMMODITIES
+  };
   let activeMarket = "forex";
 
   // Nav elements
@@ -1559,34 +1671,38 @@
   // Wizard screens
   const screenMarket = document.getElementById("screenMarket");
   const screenPair   = document.getElementById("screenPair");
-  const screenTime   = document.getElementById("screenTime");
-  const screenAction = document.getElementById("screenAction");
   const screenResult = document.getElementById("screenResult");
   const profilePanel = document.getElementById("profilePanel");
   const historyPanel = document.getElementById("historyPanel");
 
-  const pairList   = document.getElementById("pairList");
-  const pairTitle  = document.getElementById("pairTitle");
-  const sumMarket  = document.getElementById("sumMarket");
-  const sumPair    = document.getElementById("sumPair");
-  const sumTime    = document.getElementById("sumTime");
-
-  const getSignalBtn = document.getElementById("getSignalBtn");
-  const statusEl      = document.getElementById("status");
-  const resultEl      = document.getElementById("result");
-  const signalEl      = document.getElementById("signal");
-  const confidenceEl  = document.getElementById("confidence");
-  const reasoningEl   = document.getElementById("reasoning");
-  const confidenceBar = document.getElementById("confidenceBar");
-  const metricsEl     = document.getElementById("metrics");
-  const signalCardEl  = document.getElementById("signalCard");
-  const partnerWrapEl = document.getElementById("partner");
-  const partnerLinkEl = document.getElementById("partnerLink");
-
-  const profileAvatar = document.getElementById("profileAvatar");
-  const profileName   = document.getElementById("profileName");
-  const profileNick   = document.getElementById("profileNick");
-  const historyEl     = document.getElementById("history");
+  const pairTitle        = document.getElementById("pairTitle");
+  const toggleAssetList  = document.getElementById("toggleAssetList");
+  const assetList        = document.getElementById("assetList");
+  const assetArrow       = document.getElementById("assetArrow");
+  const selectedAssetRow = document.getElementById("selectedAssetRow");
+  const selectedAssetVal = document.getElementById("selectedAssetVal");
+  const timeSection      = document.getElementById("timeSection");
+  const toggleTimeList   = document.getElementById("toggleTimeList");
+  const timeList         = document.getElementById("timeList");
+  const timeArrow        = document.getElementById("timeArrow");
+  const selectedTimeRow  = document.getElementById("selectedTimeRow");
+  const selectedTimeVal  = document.getElementById("selectedTimeVal");
+  const getSignalWrap    = document.getElementById("getSignalWrap");
+  const getSignalBtn     = document.getElementById("getSignalBtn");
+  const statusEl         = document.getElementById("status");
+  const resultEl         = document.getElementById("result");
+  const signalEl         = document.getElementById("signal");
+  const confidenceEl     = document.getElementById("confidence");
+  const reasoningEl      = document.getElementById("reasoning");
+  const confidenceBar    = document.getElementById("confidenceBar");
+  const metricsEl        = document.getElementById("metrics");
+  const signalCardEl     = document.getElementById("signalCard");
+  const partnerWrapEl    = document.getElementById("partner");
+  const partnerLinkEl    = document.getElementById("partnerLink");
+  const profileAvatar    = document.getElementById("profileAvatar");
+  const profileName      = document.getElementById("profileName");
+  const profileNick      = document.getElementById("profileNick");
+  const historyEl        = document.getElementById("history");
 
   // Set profile info
   profileName.textContent = fullName;
@@ -1602,56 +1718,111 @@
   let selectedMarket = null;
   let selectedPair   = null;
   let selectedTime   = null;
-  const MARKET_LABELS = { forex: "FOREX", crypto: "CRYPTO", stocks: "STOCKS" };
+  const MARKET_LABELS = {
+    forex: "ВАЛЮТЫ", indexes: "ИНДЕКСЫ", stocks: "АКЦИИ",
+    crypto: "КРИПТОВАЛЮТЫ", commodities: "СЫРЬЕВЫЕ ТОВАРЫ"
+  };
 
   function closeAllPanels() {
-    [screenMarket, screenPair, screenTime, screenAction, screenResult, profilePanel, historyPanel]
-      .forEach(p => p.classList.remove("open"));
+    [screenMarket, screenPair, screenResult, profilePanel, historyPanel]
+      .forEach(p => {
+        p.classList.remove("open", "anim-forward", "anim-back");
+        p.style.display = "none";
+      });
   }
-  function openPanel(panel) {
+
+  function openPanel(panel, direction = "forward") {
     closeAllPanels();
+    panel.style.display = "flex";
+    panel.offsetHeight;
     panel.classList.add("open");
+    panel.classList.add(direction === "back" ? "anim-back" : "anim-forward");
+  }
+
+  // Сброс состояния экрана выбора инструмента
+  function resetPairScreen() {
+    selectedPair = null;
+    selectedTime = null;
+    selectedAssetRow.style.display = "none";
+    selectedAssetVal.textContent = "—";
+    document.getElementById("assetAccordion").style.display = "flex";
+    assetList.classList.remove("open");
+    assetArrow.classList.remove("open");
+    timeSection.style.display = "none";
+    selectedTimeRow.style.display = "none";
+    selectedTimeVal.textContent = "—";
+    document.getElementById("toggleTimeList").parentElement.style.display = "flex";
+    timeList.classList.remove("open");
+    timeArrow.classList.remove("open");
+    getSignalWrap.style.display = "none";
+    statusEl.textContent = "";
   }
 
   // Main menu tiles
-  openSignal.addEventListener("click", () => openPanel(screenMarket));
-  tabProfile.addEventListener("click", () => openPanel(profilePanel));
-  tabHistory.addEventListener("click", () => { openPanel(historyPanel); loadHistory(); });
+  openSignal.addEventListener("click", () => openPanel(screenMarket, "forward"));
+  tabProfile.addEventListener("click", () => openPanel(profilePanel, "forward"));
+  tabHistory.addEventListener("click", () => { openPanel(historyPanel, "forward"); loadHistory(); });
 
-  // Step 1 → market selected
-  screenMarket.querySelectorAll(".big-tile").forEach(btn => {
+  // Step 1 → категория выбрана
+  screenMarket.querySelectorAll(".cat-tile").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedMarket = btn.dataset.market;
       pairTitle.textContent = MARKET_LABELS[selectedMarket];
-      buildPairList(selectedMarket);
-      openPanel(screenPair);
+      resetPairScreen();
+      buildAssetList(selectedMarket);
+      openPanel(screenPair, "forward");
     });
   });
 
-  // Step 2 → pair list builder
-  function buildPairList(market) {
-    pairList.innerHTML = "";
+  // Аккордеон — список активов
+  function buildAssetList(market) {
+    assetList.innerHTML = "";
     MARKET_DATA[market].forEach(item => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "pair-row";
+      btn.className = "list-item";
       btn.textContent = item;
       btn.addEventListener("click", () => {
         selectedPair = item;
-        openPanel(screenTime);
+        selectedAssetVal.textContent = item;
+        selectedAssetRow.style.display = "flex";
+        // скрываем кнопку выбора актива полностью
+        document.getElementById("assetAccordion").style.display = "none";
+        // закрываем аккордеон
+        assetList.classList.remove("open");
+        assetArrow.classList.remove("open");
+        // показываем выбор времени
+        timeSection.style.display = "flex";
+        timeSection.style.flexDirection = "column";
+        timeSection.style.gap = "10px";
       });
-      pairList.appendChild(btn);
+      assetList.appendChild(btn);
     });
   }
 
-  // Step 3 → time selected
-  screenTime.querySelectorAll(".time-tile").forEach(btn => {
+  toggleAssetList.addEventListener("click", () => {
+    const isOpen = assetList.classList.toggle("open");
+    assetArrow.classList.toggle("open", isOpen);
+  });
+
+  // Аккордеон — список времён
+  toggleTimeList.addEventListener("click", () => {
+    const isOpen = timeList.classList.toggle("open");
+    timeArrow.classList.toggle("open", isOpen);
+  });
+
+  timeList.querySelectorAll(".list-item").forEach(btn => {
     btn.addEventListener("click", () => {
       selectedTime = btn.dataset.time;
-      sumMarket.textContent = MARKET_LABELS[selectedMarket];
-      sumPair.textContent   = selectedPair;
-      sumTime.textContent   = selectedTime;
-      openPanel(screenAction);
+      selectedTimeVal.textContent = btn.dataset.time;
+      selectedTimeRow.style.display = "flex";
+      // скрываем кнопку выбора времени
+      document.getElementById("toggleTimeList").parentElement.style.display = "none";
+      // закрываем аккордеон
+      timeList.classList.remove("open");
+      timeArrow.classList.remove("open");
+      // показываем кнопку получить сигнал
+      getSignalWrap.style.display = "block";
     });
   });
 
@@ -1659,10 +1830,9 @@
   document.querySelectorAll(".back-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const target = btn.dataset.back;
-      if (target === "main")    { closeAllPanels(); return; }
-      if (target === "market")  { openPanel(screenMarket); return; }
-      if (target === "pair")    { openPanel(screenPair); return; }
-      if (target === "time")    { openPanel(screenTime); return; }
+      if (target === "main")   { closeAllPanels(); return; }
+      if (target === "market") { openPanel(screenMarket, "back"); return; }
+      if (target === "pair")   { openPanel(screenPair,   "back"); return; }
     });
   });
 
@@ -1772,7 +1942,7 @@
   const fontSize = 14;
 
   function resize() {
-    const rect = canvas.getBoundingClientRect();
+    const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width  = Math.max(1, Math.floor(rect.width));
     canvas.height = Math.max(1, Math.floor(rect.height));
     const count = Math.floor(canvas.width / fontSize);
@@ -1780,9 +1950,9 @@
   }
 
   function draw() {
-    ctx.fillStyle = "rgba(6, 8, 8, 0.10)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = `${fontSize}px monospace`;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);    ctx.font = `${fontSize}px monospace`;
 
     for (let i = 0; i < columns.length; i++) {
       const text = glyphs[Math.floor(Math.random() * glyphs.length)];
@@ -1800,6 +1970,43 @@
   resize();
   setInterval(draw, 40);
   loadHistory();
+
+  // ── PANEL MATRIX: run matrix animation on all overlay canvases ──
+  (function() {
+    const panelGlyphs = "01アイウエオカキクケコサシスセソ1234567890BTCUSDT▲▼";
+    const pFontSize = 14;
+
+    document.querySelectorAll('.panel-matrix').forEach(pc => {
+      const pCtx = pc.getContext('2d');
+      let pCols = [];
+
+      function pResize() {
+        const rect = pc.parentElement.getBoundingClientRect();
+        pc.width  = Math.max(1, Math.floor(rect.width  || 380));
+        pc.height = Math.max(1, Math.floor(rect.height || 640));
+        const count = Math.floor(pc.width / pFontSize);
+        pCols = new Array(count).fill(0).map(() => Math.random() * pc.height / pFontSize);
+      }
+
+      function pDraw() {
+        pCtx.fillStyle = "rgba(0, 0, 0, 0.12)";
+        pCtx.fillRect(0, 0, pc.width, pc.height);
+        pCtx.font = `${pFontSize}px monospace`;
+        for (let i = 0; i < pCols.length; i++) {
+          const text = panelGlyphs[Math.floor(Math.random() * panelGlyphs.length)];
+          const g = 120 + Math.floor(Math.random() * 120);
+          pCtx.fillStyle = `rgb(35, ${g}, 95)`;
+          pCtx.fillText(text, i * pFontSize, pCols[i] * pFontSize);
+          if (pCols[i] * pFontSize > pc.height && Math.random() > 0.975) pCols[i] = 0;
+          pCols[i] += 1;
+        }
+      }
+
+      pResize();
+      setInterval(pDraw, 40);
+      window.addEventListener("resize", pResize);
+    });
+  })();
 </script>
 </body>
 </html>

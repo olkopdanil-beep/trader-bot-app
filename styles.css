@@ -1,0 +1,452 @@
+/* ============================================================
+   VECTOR ORACLE AI — Premium Neon Border Runner
+   Applied to: c:\trader-bot\index.html
+   ============================================================ */
+
+@property --runner-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+:root {
+  --neon-rgb: 61, 255, 160;
+  --neon: #3dffa0;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   NEON BORDER RUNNER — .tile (главные 3 кнопки)
+   ============================================================ */
+
+.tile {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+
+/* Comet layer */
+.tile::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--runner-angle, 0deg),
+    transparent        0deg,
+    transparent        295deg,
+    rgba(var(--neon-rgb), 0.05) 305deg,
+    rgba(var(--neon-rgb), 0.6)  330deg,
+    rgba(var(--neon-rgb), 1.0)  345deg,
+    rgba(var(--neon-rgb), 0.6)  360deg,
+    transparent        360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+  animation: runnerSpin 3.5s linear infinite;
+}
+
+/* Bloom layer */
+.tile::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  padding: 4px;
+  background: conic-gradient(
+    from var(--runner-angle, 0deg),
+    transparent        0deg,
+    transparent        310deg,
+    rgba(var(--neon-rgb), 0.0)  315deg,
+    rgba(var(--neon-rgb), 0.15) 335deg,
+    rgba(var(--neon-rgb), 0.25) 345deg,
+    rgba(var(--neon-rgb), 0.15) 355deg,
+    transparent        360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  border-radius: inherit;
+  filter: blur(5px);
+  pointer-events: none;
+  z-index: 2;
+  animation: runnerSpin 3.5s linear infinite;
+}
+
+/* Hover: faster + brighter + elevate */
+.tile:hover::before {
+  animation-duration: 1.8s;
+  filter: brightness(1.3);
+}
+.tile:hover::after {
+  animation-duration: 1.8s;
+  filter: blur(5px) brightness(1.5);
+}
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(var(--neon-rgb), 0.2);
+  transition: transform 280ms var(--ease-expo), box-shadow 280ms var(--ease-expo);
+}
+.tile:active {
+  transform: scale(0.98);
+  transition-duration: 120ms;
+}
+
+/* ============================================================
+   NEON BORDER RUNNER — .cat-tile (5 категорий)
+   ============================================================ */
+
+.cat-tile {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+
+.cat-tile::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--runner-angle, 0deg),
+    transparent        0deg,
+    transparent        295deg,
+    rgba(var(--neon-rgb), 0.05) 305deg,
+    rgba(var(--neon-rgb), 0.6)  330deg,
+    rgba(var(--neon-rgb), 1.0)  345deg,
+    rgba(var(--neon-rgb), 0.6)  360deg,
+    transparent        360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-std);
+}
+
+.cat-tile::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  padding: 4px;
+  background: conic-gradient(
+    from var(--runner-angle, 0deg),
+    transparent        0deg,
+    transparent        310deg,
+    rgba(var(--neon-rgb), 0.0)  315deg,
+    rgba(var(--neon-rgb), 0.18) 340deg,
+    rgba(var(--neon-rgb), 0.18) 350deg,
+    transparent        360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  border-radius: inherit;
+  filter: blur(5px);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-std);
+}
+
+.cat-tile:hover::before,
+.cat-tile:hover::after {
+  opacity: 1;
+  animation: runnerSpin 2s linear infinite;
+}
+
+.cat-tile:hover {
+  transform: translateY(-2px);
+  transition: transform 260ms var(--ease-expo);
+}
+.cat-tile:active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
+/* ============================================================
+   NEON BORDER RUNNER — .accordion-btn
+   ============================================================ */
+
+.accordion-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+
+.accordion-btn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--runner-angle, 0deg),
+    transparent        0deg,
+    transparent        295deg,
+    rgba(var(--neon-rgb), 0.5)  330deg,
+    rgba(var(--neon-rgb), 0.9)  345deg,
+    rgba(var(--neon-rgb), 0.5)  360deg,
+    transparent        360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-std);
+}
+
+.accordion-btn:hover::before {
+  opacity: 1;
+  animation: runnerSpin 2.2s linear infinite;
+}
+
+/* ============================================================
+   NEON BORDER RUNNER — .pulse-btn (Получить сигнал)
+   ============================================================ */
+
+.pulse-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+
+.pulse-btn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--runner-angle, 0deg),
+    transparent        0deg,
+    transparent        280deg,
+    rgba(var(--neon-rgb), 0.1)  295deg,
+    rgba(var(--neon-rgb), 0.7)  325deg,
+    rgba(var(--neon-rgb), 1.0)  340deg,
+    rgba(var(--neon-rgb), 0.7)  355deg,
+    transparent        360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+  animation: runnerSpin 1.6s linear infinite;
+}
+
+.pulse-btn::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  padding: 5px;
+  background: conic-gradient(
+    from var(--runner-angle, 0deg),
+    transparent        0deg,
+    transparent        300deg,
+    rgba(var(--neon-rgb), 0.2)  335deg,
+    rgba(var(--neon-rgb), 0.35) 345deg,
+    rgba(var(--neon-rgb), 0.2)  355deg,
+    transparent        360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  border-radius: inherit;
+  filter: blur(6px);
+  pointer-events: none;
+  z-index: 2;
+  animation: runnerSpin 1.6s linear infinite;
+}
+
+/* ============================================================
+   KEYFRAME
+   ============================================================ */
+
+@keyframes runnerSpin {
+  from { --runner-angle: 0deg; }
+  to   { --runner-angle: 360deg; }
+}
+
+/* ============================================================
+   CARD OPEN — cinematic reveal
+   ============================================================ */
+
+@keyframes cardReveal {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.975); filter: blur(3px); }
+  55%  { filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes fadeSlideIn {
+  0%   { opacity: 0; transform: translateX(14px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Side panels open — slide only, NO opacity fade to avoid ghost */
+.side-panel.anim-forward {
+  animation: slideInRight 0.26s cubic-bezier(0.4, 0, 0.2, 1) both !important;
+}
+.side-panel.anim-back {
+  animation: slideInLeft 0.26s cubic-bezier(0.4, 0, 0.2, 1) both !important;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(30px); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-30px); }
+  to   { transform: translateX(0); }
+}
+
+/* Override cardReveal on side-panel — no opacity animation */
+.side-panel.open {
+  animation: none !important;
+}
+
+/* History items stagger */
+.history-item {
+  animation: fadeSlideIn 280ms var(--ease-expo) both;
+}
+.history-item:nth-child(1) { animation-delay:   0ms; }
+.history-item:nth-child(2) { animation-delay:  40ms; }
+.history-item:nth-child(3) { animation-delay:  80ms; }
+.history-item:nth-child(4) { animation-delay: 120ms; }
+.history-item:nth-child(n+5) { animation-delay: 160ms; }
+
+/* ============================================================
+   SIGNAL PULSE
+   ============================================================ */
+
+@keyframes signalPulse {
+  0%, 100% { opacity: 1;    text-shadow: 0 0 6px currentColor; }
+  50%       { opacity: 0.8; text-shadow: 0 0 18px currentColor, 0 0 36px currentColor; }
+}
+
+.signal.up,
+.signal.down {
+  animation: signalPulse 2.4s var(--ease-quart) infinite;
+}
+
+/* Progress bar glow */
+@keyframes barGlow {
+  0%, 100% { box-shadow: 0 0 4px rgba(var(--neon-rgb), 0.3); }
+  50%       { box-shadow: 0 0 12px rgba(var(--neon-rgb), 0.7), 0 0 24px rgba(var(--neon-rgb), 0.2); }
+}
+
+.progress > div {
+  animation: barGlow 1.8s var(--ease-quart) infinite;
+}
+
+/* ============================================================
+   STATUS BLINK
+   ============================================================ */
+
+@keyframes statusBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.status:not(:empty) {
+  animation: statusBlink 1.1s var(--ease-quart) infinite;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   SIDE PANEL CONTENT — above canvas (z-index 102)
+   ============================================================ */
+
+/* ALL cards/buttons — z-index 3 (above canvas z-index 2), 90% black */
+.tile,
+.tile-main,
+.tiles-bottom,
+.cat-tile,
+.accordion-btn,
+.list-item,
+.selected-row,
+.pulse-btn,
+.back-btn,
+.history-item,
+.profile-box,
+.result,
+.signal-card,
+.summary-box,
+.side-panel-head,
+.side-panel-title,
+.screen-content,
+.history {
+  position: relative;
+  z-index: 3;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   BOLD FONT — everywhere
+   ============================================================ */
+
+* {
+  font-family: 'Press Start 2P', monospace !important;
+  font-weight: 400 !important;
+}
+
+.tile-label,
+.tile-label-main,
+.cat-tile,
+.accordion-btn,
+.list-item,
+.back-btn,
+.pulse-btn,
+.side-panel-title,
+.title,
+.signal {
+  font-size: 11px !important;
+  line-height: 1.8 !important;
+}
