@@ -639,7 +639,13 @@
     }
 
     /* ── SPLASH: Cyberpunk-style font ── */
-    @import url('https://fonts.googleapis.com/css2?family=Metal+Mania&display=swap');
+    @font-face {
+      font-family: 'Cyberpunk';
+      src: url('./fonts/Cyberpunk_RUS_BY_LYAJKA.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
 
     /* ── SPLASH SCREEN ── */
     #splash {
@@ -672,7 +678,7 @@
     }
 
     .splash-title {
-      font-family: 'Metal Mania', cursive;
+      font-family: 'Cyberpunk', sans-serif;
       font-size: 14px;
       font-weight: 400;
       letter-spacing: 0.15em;
